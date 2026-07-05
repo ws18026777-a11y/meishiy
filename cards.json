@@ -1,6 +1,6 @@
 {
   "keys": {
     "ABC123": { "expire": "2026-12-31", "type": "永久", "device": "" },
-    "DEF456": { "expire": "2026-06-30", "type": "半年", "device": "DEV_39K4T4AMIW" }
+    "DEF456": { "expire": "2026-07-30", "type": "半年", "device": "DEV_39K4T4AMIW" }
   }
 }
