@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>美式释意·全能修改器</title>
+    <style>
+        /* ===== 完整样式 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: rgba(0,0,0,0.3); color: #000000; height: 100vh; overflow: hidden; position: relative; }
+        .frame { height: 100%; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); backdrop-filter: blur(8px); }
+        .top-bar { background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: none; z-index: 20; }
+        .menu-btn { background: #90EE90; border: 1px solid #2e7d32; width: 40px; height: 40px; border-radius: 40px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; color: #000; font-weight: bold; transition: 0.2s; }
+        .menu-btn:active { transform: scale(0.96); }
+        .app-title { font-size: 20px; font-weight: 800; color: #000; letter-spacing: 1px; }
+        .drawer { position: fixed; top: 0; left: 0; width: 80%; max-width: 280px; height: 100%; background: rgba(255,255,255,0.95); backdrop-filter: blur(16px); z-index: 100; transform: translateX(-100%); transition: transform 0.25s ease-out; box-shadow: 2px 0 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow-y: auto; border-right: none; }
+        .drawer.open { transform: translateX(0); }
+        .drawer-header { padding: 24px 20px 12px; font-size: 24px; font-weight: bold; color: #000; border-bottom: none; }
+        .drawer-item { padding: 14px 20px; font-size: 16px; font-weight: 500; border-left: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #000; }
+        .drawer-item:active { background: #90EE90; }
+        .submenu-drawer { padding-left: 32px; background: rgba(0,0,0,0.05); display: none; }
+        .submenu-drawer .drawer-item { padding: 10px 16px; font-size: 14px; }
+        .drawer-close { position: absolute; top: 16px; right: 16px; font-size: 26px; cursor: pointer; color: #000; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; display: none; }
+        .overlay.show { display: block; }
+        .main-content { flex: 1; overflow-y: auto; padding: 0; -webkit-overflow-scrolling: touch; }
+        .card { background: rgba(255,255,255,0.85); border-radius: 0; padding: 16px 18px; margin-bottom: 16px; border: none; backdrop-filter: blur(4px); overflow-x: hidden; }
+        .card-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; border-left: 4px solid #90EE90; padding-left: 12px; color: #000; }
+        .content-pane { display: none; }
+        .active-pane { display: block; }
+        .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .input-row .row-name { font-size: 14px; font-weight: 500; color: #000; min-width: 100px; }
+        .input-row .input-wrapper { flex: 2; display: flex; gap: 8px; min-width: 180px; }
+        .input-row input { flex: 1; background: rgba(255,255,255,0.9); border: 1px solid #90EE90; border-radius: 30px; padding: 8px 12px; font-size: 14px; color: #000; min-width: 80px; }
+        .input-row button { background: #90EE90; border: 1px solid #2e7d32; border-radius: 30px; padding: 8px 16px; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .input-row button:active { transform: scale(0.96); }
+        .action-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding: 4px 0; }
+        .action-row .row-name { font-size: 14px; font-weight: 500; color: #000; }
+        .action-btn { background: #90EE90; border: 1px solid #2e7d32; border-radius: 40px; padding: 6px 16px; font-weight: bold; cursor: pointer; transition: 0.2s; min-width: 80px; text-align: center; color: #000; }
+        .action-btn:active { transform: scale(0.96); }
+        .basketball-btn { background: #90EE90; border: 2px solid #2e7d32 !important; border-radius: 40px; padding: 6px 12px; cursor: pointer; transition: 0.2s; min-width: 80px; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .basketball-btn:hover { background: #7bda7b; }
+        .basketball-btn:active { transform: scale(0.96); }
+        .basketball-icon { font-size: 24px; line-height: 1; }
+        .toggle-status-btn { background: #90EE90; border: 2px solid #2e7d32; border-radius: 40px; padding: 6px 12px; cursor: pointer; transition: 0.2s; min-width: 80px; text-align: center; font-size: 20px; font-weight: bold; }
+        .toggle-status-btn:hover { background: #7bda7b; }
+        .switch-wrapper { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+        .switch-label { font-size: 16px; font-weight: bold; color: #000; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 33px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 43px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #90EE90; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .status-text { margin-left: 10px; font-size: 14px; color: #000; }
+        .dual-input-section { margin: 16px 0; }
+        .input-group { margin-bottom: 12px; }
+        .input-group input { width: 100% !important; padding: 8px 14px !important; border-radius: 30px !important; border: 2px solid #90EE90 !important; background: #ffffff !important; color: #000 !important; font-size: 14px !important; outline: none !important; transition: 0.2s !important; }
+        .input-group input:focus { border-color: #2e7d32 !important; box-shadow: 0 0 8px rgba(144,238,144,0.4) !important; }
+        .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.1); flex-wrap: wrap; gap: 12px; }
+        .setting-label { font-size: 15px; color: #000; }
+        .setting-control { display: flex; align-items: center; gap: 12px; }
+        .settings-group h3 { font-size: 18px; margin-bottom: 16px; color: #000; }
+        .toggle-switch { width: 44px; height: 22px; background: #ccc; border-radius: 30px; position: relative; cursor: pointer; transition: 0.2s; }
+        .toggle-switch.active { background: #90EE90; }
+        .toggle-switch::after { content: ""; width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 3px; transition: 0.2s; }
+        .toggle-switch.active::after { left: 23px; }
+        .tendency-grid { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+        .tendency-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.7); border-radius: 30px; padding: 8px 16px; border: none; gap: 12px; flex-wrap: wrap; }
+        .tendency-item span { font-size: 14px; font-weight: 500; color: #000; min-width: 110px; }
+        .tendency-slider { flex: 2; min-width: 200px; display: flex; align-items: center; gap: 12px; }
+        .tendency-slider input { flex: 1; min-width: 100px; background: rgba(255,255,255,0.9); border: none; border-radius: 30px; height: 6px; -webkit-appearance: none; }
+        .tendency-slider input:focus { outline: none; }
+        .tendency-slider input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #90EE90; border: 1px solid #2e7d32; cursor: pointer; }
+        .tendency-value { background: rgba(255,255,255,0.9); border: 1px solid #90EE90; border-radius: 30px; padding: 4px 10px; font-size: 13px; min-width: 55px; text-align: center; font-family: monospace; white-space: nowrap; }
+        .style-selector { margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: rgba(255,255,255,0.7); padding: 12px; border-radius: 30px; border: none; }
+        .style-selector label { font-weight: bold; color: #000; }
+        .style-selector select { background: rgba(255,255,255,0.9); border: 1px solid #90EE90; border-radius: 30px; padding: 6px 12px; color: #000; }
+        .message-text { margin-top: 8px; font-size: 14px; color: #000; margin-bottom: 12px; }
+        .jersey-section { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid rgba(0,0,0,0.08); }
+        .jersey-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .jersey-section h3 { font-size: 18px; color: #2e7d32; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .jersey-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .jersey-row select, .jersey-row input, .jersey-row button { padding: 8px 14px; border-radius: 30px; border: 1px solid #90EE90; background: rgba(255,255,255,0.9); color: #000; font-size: 14px; }
+        .jersey-row button { background: #90EE90; font-weight: bold; cursor: pointer; border-color: #2e7d32; transition: 0.2s; }
+        .jersey-row button:active { transform: scale(0.96); }
+        .jersey-status { font-size: 15px; color: #000; padding: 4px 0; }
+        .jersey-status b { color: #2e7d32; }
+        .jersey-msg { margin-top: 8px; padding: 8px 14px; border-radius: 30px; background: rgba(0,0,0,0.05); font-size: 14px; color: #000; }
+        .jersey-msg.error { color: #d32f2f; background: rgba(211,47,47,0.1); }
+        .jersey-color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin: 10px 0; }
+        .jersey-color-item { display: flex; align-items: center; gap: 6px; font-size: 13px; flex-wrap: wrap; background: rgba(255,255,255,0.4); border-radius: 20px; padding: 4px 8px; }
+        .jersey-color-item label { min-width: 70px; color: #000; font-weight: 500; }
+        .jersey-color-item input { width: 72px; padding: 6px 8px; border-radius: 20px; border: 1px solid #90EE90; background: rgba(255,255,255,0.9); color: #000; text-align: center; font-size: 14px; flex: 1; min-width: 60px; }
+        .jersey-color-item button { padding: 4px 10px; font-size: 12px; border-radius: 20px; min-width: 46px; background: #90EE90; border: 1px solid #2e7d32; cursor: pointer; font-weight: bold; transition: 0.2s; margin: 2px; }
+        .jersey-color-item button:active { transform: scale(0.96); }
+        .jersey-action-group { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+        .jersey-action-group button { flex: 1; min-width: 100px; padding: 8px 16px; border-radius: 30px; border: 1px solid #2e7d32; background: #90EE90; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .jersey-action-group button:active { transform: scale(0.96); }
+        .jersey-hint { font-size: 12px; color: #666; margin: 4px 0 8px; }
+        .jersey-divider { height: 1px; background: rgba(0,0,0,0.08); margin: 16px 0; }
+        @media (max-width: 480px) { .jersey-color-grid { grid-template-columns: 1fr; } .jersey-color-item input { width: 60px; } }
+        .double-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .double-row .col { display: flex; flex-direction: column; gap: 8px; }
+        .double-row .col label { font-size: 14px; color: #000; font-weight: 500; }
+        .double-row .col input { width: 100%; padding: 8px 14px; border-radius: 30px; border: 2px solid #90EE90; background: #ffffff; color: #000; font-size: 14px; outline: none; transition: 0.2s; }
+        .double-row .col input:focus { border-color: #2e7d32; box-shadow: 0 0 8px rgba(144,238,144,0.4); }
+        .double-row .col button { width: 100%; padding: 8px 14px; border-radius: 30px; border: 2px solid #2e7d32; background: #90EE90; font-weight: bold; cursor: pointer; font-size: 14px; color: #000; transition: 0.2s; }
+        .double-row .col button:hover { background: #7bda7b; }
+        .double-row .col button:active { transform: scale(0.96); }
+        .hint { font-size: 14px; color: #888; text-align: center; margin-bottom: 8px; }
+        #streetCourtTypeSelect { width: 100%; padding: 8px 14px; border-radius: 30px; border: 2px solid #90EE90; background: #ffffff; color: #000; font-size: 14px; outline: none; transition: 0.2s; }
+        #streetCourtTypeSelect:focus { border-color: #2e7d32; box-shadow: 0 0 8px rgba(144,238,144,0.4); }
+        #courtTeamSelect { padding: 8px 14px; border-radius: 30px; border: 2px solid #90EE90; background: #ffffff; color: #000; font-size: 14px; flex: 1; outline: none; transition: 0.2s; }
+        #courtTeamSelect:focus { border-color: #2e7d32; box-shadow: 0 0 8px rgba(144,238,144,0.4); }
+        .status-line { font-size: 15px; color: #000; padding: 4px 0; text-align: center; }
+        .status-line b { color: #2e7d32; }
+        .logo-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; }
+        .logo-row select, .logo-row input { padding: 8px 14px; border-radius: 30px; border: 2px solid #90EE90; background: #ffffff; color: #000; font-size: 14px; outline: none; transition: 0.2s; flex: 1; }
+        .logo-row input:focus { border-color: #2e7d32; box-shadow: 0 0 8px rgba(144,238,144,0.4); }
+        .logo-row button { padding: 8px 14px; border-radius: 30px; border: 2px solid #2e7d32; background: #90EE90; font-weight: bold; cursor: pointer; font-size: 14px; color: #000; transition: 0.2s; }
+        .logo-row button:hover { background: #7bda7b; }
+        .logo-row button:active { transform: scale(0.96); }
+        .logo-status { font-size: 15px; color: #000; padding: 4px 0; }
+        .logo-status b { color: #2e7d32; }
+        .court-type-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin: 8px 0; }
+        .court-type-grid button { padding: 6px 8px; border-radius: 16px; border: 1px solid #2e7d32; background: rgba(255,255,255,0.7); font-weight: 500; cursor: pointer; font-size: 12px; transition: 0.2s; color: #000; }
+        .court-type-grid button:active { transform: scale(0.96); }
+        .court-type-grid button.active { background: #90EE90; border-color: #1b5e20; font-weight: bold; }
+        .small-btn { padding: 4px 12px; font-size: 12px; border-radius: 20px; border: 1px solid #2e7d32; background: #90EE90; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .small-btn:active { transform: scale(0.96); }
+        .action-btn { border: 2px solid #2e7d32 !important; }
+        .action-btn:hover { background: #7bda7b; }
+        .toggle-status-btn { border: 2px solid #2e7d32 !important; }
+        .toggle-status-btn:hover { background: #7bda7b; }
+        .small-btn { border: 2px solid #2e7d32 !important; }
+        .small-btn:hover { background: #7bda7b; }
+
+        /* ===== 加固版授权界面 ===== */
+        #authOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(24px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            font-family: system-ui;
+        }
+        #authOverlay .box {
+            background: rgba(20,20,28,0.95);
+            backdrop-filter: blur(20px);
+            padding: 28px 24px;
+            border-radius: 32px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+        #authOverlay .box h3 { font-size: 22px; margin-bottom: 4px; letter-spacing: 2px; }
+        #authOverlay .box .subtitle { font-size: 13px; color: #888; margin-bottom: 16px; }
+        #authOverlay .device { background: #0c0c14; padding: 14px; border-radius: 14px; margin: 12px 0 16px; color: #4caf50; font-family: 'Courier New', monospace; word-break: break-all; font-size: 13px; border: 1px solid rgba(76,175,80,0.2); user-select: all; cursor: text; }
+        #authOverlay .device-label { font-size: 12px; color: #666; margin-bottom: 4px; }
+        #authOverlay input { width: 100%; padding: 14px 16px; margin-top: 8px; border-radius: 30px; border: 2px solid #2a2a3a; box-sizing: border-box; background: #0c0c14; color: white; font-size: 15px; outline: none; transition: 0.3s; letter-spacing: 1px; font-family: 'Courier New', monospace; }
+        #authOverlay input:focus { border-color: #4caf50; box-shadow: 0 0 20px rgba(76,175,80,0.15); }
+        #authOverlay input::placeholder { color: #444; letter-spacing: 0; }
+        #authOverlay button { width: 100%; padding: 14px; margin-top: 12px; border-radius: 30px; border: none; background: linear-gradient(135deg, #4caf50, #2e7d32); color: white; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s; letter-spacing: 1px; }
+        #authOverlay button:hover { transform: scale(1.02); box-shadow: 0 8px 30px rgba(76,175,80,0.3); }
+        #authOverlay button:active { transform: scale(0.97); }
+        #authOverlay .error-msg { color: #ff6b6b; margin-top: 12px; font-size: 13px; display: none; }
+        #authOverlay .success-msg { color: #4caf50; margin-top: 12px; font-size: 13px; display: none; }
+        #authOverlay .hint-text { font-size: 12px; color: #555; margin-top: 14px; }
+        #authOverlay .version-text { font-size: 11px; color: #333; margin-top: 16px; }
+        #authOverlay .copy-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #888; padding: 4px 14px; border-radius: 12px; font-size: 11px; cursor: pointer; margin-top: 4px; transition: 0.2s; }
+        #authOverlay .copy-btn:hover { background: rgba(255,255,255,0.12); color: #ccc; }
+        #authOverlay .bind-info { font-size: 12px; color: #555; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 10px; }
+        .auth-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #4caf50; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .auth-lock-icon { font-size: 36px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 加固版授权覆盖层 ===== -->
+    <div id="authOverlay">
+        <div class="box">
+            <div class="auth-lock-icon">🔐</div>
+            <h3>美式釋意</h3>
+            <p class="subtitle">全能修改器 · 授权验证</p>
+            <div class="device-label">📱 设备指纹</div>
+            <div class="device" id="deviceDisplay">加载中...</div>
+            <button class="copy-btn" id="copyDeviceBtn">📋 复制设备码</button>
+            <input type="text" id="keyInput" placeholder="请输入激活码" autocomplete="off" spellcheck="false">
+            <div class="error-msg" id="errorMsg"></div>
+            <div class="success-msg" id="successMsg"></div>
+            <button id="activeBtn" style="position:relative;">
+                <span id="activeBtnText">🔓 立即激活</span>
+            </button>
+            <div class="bind-info" id="bindInfo">未绑定设备</div>
+            <div class="hint-text">💡 激活后将绑定当前设备</div>
+            <div class="version-text">美式释意 v2.6.0 · 安全加固版</div>
+        </div>
+    </div>
+
+    <!-- ===== 主应用 ===== -->
+    <div class="frame" id="mainApp" style="display:none;">
+        <div class="top-bar">
+            <button class="menu-btn" id="menuBtn">☰</button>
+            <div class="app-title">🏀 美式释意</div>
+        </div>
+
+        <div id="drawer" class="drawer">
+            <div class="drawer-header">菜单</div>
+            <div class="drawer-close" id="closeDrawerBtn">✕</div>
+            <div id="drawerMenuList"></div>
+        </div>
+        <div id="overlay" class="overlay"></div>
+
+        <div class="main-content" id="mainContent">
+            <div id="c1" class="content-pane"><div class="card"><div class="card-title">面补功能</div><div id="facePanel"></div></div></div>
+            <div id="c2" class="content-pane"><div class="card"><div class="card-title">护具功能</div><div id="gearPanel"></div></div></div>
+            <div id="c3" class="content-pane"><div class="card"><div class="card-title">街头球馆功能</div><div id="courtPanel"></div></div></div>
+            <div id="c5" class="content-pane"><div class="card"><div class="card-title">卫衣功能</div><p>无人扶我青云志，我自踏雪至山巅</p><div id="hoodiePanel"></div></div></div>
+            <div id="c6" class="content-pane"><div class="card"><div class="card-title">⛹️ 球衣功能</div><div id="jerseyPanel"></div></div></div>
+            <div id="c10" class="content-pane"><div class="card"><div class="card-title">姓名修改</div><div id="namePanel"></div></div></div>
+            <div id="c11" class="content-pane"><div class="card"><div class="card-title">画质功能</div><div id="qualityPanel"></div></div></div>
+            <div id="c8" class="content-pane"><div class="card"><div class="card-title">无敌·全局倾向</div><div id="tendencyPanel"></div></div></div>
+            <div id="c9" class="content-pane"><div class="card"><div class="card-title">⚙️ 设置中心</div><div id="settingsPanel"></div></div></div>
+            <div id="c12" class="content-pane"><div class="card"><div class="card-title">🏷️ 球队Logo</div><div id="logoPanel"></div></div></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl-fast.min.js"></script>
+    <script>
+        // ============================================================
+        // 🔐 加固版验证系统 (替换原版)
+        // ============================================================
+
+        const PUBLIC_KEY_B64 = "1YZsKn91m+iA34QxPqvPzWGaJJ6JEGqLP9Fu5sCL/5g=";
+        const STORAGE_KEYS = ['__auth_v2_1', '__auth_v2_2', '__auth_v2_3'];
+        const VALIDITY_CHECK_INTERVAL = 5000;
+
+        function fromBase64(b64) { 
+            try { return Uint8Array.from(atob(b64), c => c.charCodeAt(0)); } 
+            catch(e) { return null; }
+        }
+        function toBase64(arr) {
+            try { return btoa(String.fromCharCode.apply(null, arr)); }
+            catch(e) { return ''; }
+        }
+        function getTimestamp() { return Math.floor(Date.now() / 1000); }
+
+        function getStableDeviceId() {
+            if (typeof h5gg !== 'undefined') {
+                try {
+                    if (h5gg.getDeviceUUID) {
+                        let uuid = h5gg.getDeviceUUID();
+                        if (uuid && uuid.length > 0) return { id: uuid, source: 'h5gg_uuid' };
+                    }
+                    if (h5gg.deviceId) {
+                        let did = h5gg.deviceId;
+                        if (did && did.length > 0) return { id: did, source: 'h5gg_deviceId' };
+                    }
+                } catch(e) {}
+            }
+
+            let components = [
+                navigator.userAgent,
+                screen.width,
+                screen.height,
+                screen.colorDepth,
+                navigator.hardwareConcurrency || 0,
+                navigator.platform,
+                navigator.language,
+                new Date().getTimezoneOffset(),
+                (function() {
+                    try {
+                        let canvas = document.createElement('canvas');
+                        canvas.width = 200;
+                        canvas.height = 50;
+                        let ctx = canvas.getContext('2d');
+                        ctx.textBaseline = 'top';
+                        ctx.font = '14px Arial';
+                        ctx.fillStyle = '#f60';
+                        ctx.fillRect(125, 1, 62, 20);
+                        ctx.fillStyle = '#069';
+                        ctx.fillText('指纹', 2, 15);
+                        return canvas.toDataURL();
+                    } catch(e) { return ''; }
+                })(),
+                (function() {
+                    try {
+                        let canvas = document.createElement('canvas');
+                        let gl = canvas.getContext('webgl');
+                        if (gl) {
+                            let info = gl.getExtension('WEBGL_debug_renderer_info');
+                            if (info) {
+                                return gl.getParameter(info.UNMASKED_RENDERER_WEBGL) + '|' + 
+                                       gl.getParameter(info.UNMASKED_VENDOR_WEBGL);
+                            }
+                        }
+                    } catch(e) {}
+                    return '';
+                })()
+            ];
+
+            let s = components.join('|||');
+            let hash = 0;
+            for (let i = 0; i < s.length; i++) {
+                hash = ((hash << 5) - hash) + s.charCodeAt(i);
+                hash |= 0;
+            }
+            return { id: 'FP_' + Math.abs(hash).toString(16).padStart(8, '0'), source: 'fingerprint' };
+        }
+
+        function getDeviceIdWithBinding() {
+            let dev = getStableDeviceId();
+            let saltKey = '__device_salt';
+            let salt = localStorage.getItem(saltKey);
+            if (!salt) {
+                let arr = new Uint8Array(8);
+                crypto.getRandomValues(arr);
+                salt = toBase64(arr);
+                localStorage.setItem(saltKey, salt);
+            }
+            let combined = dev.id + '|' + salt;
+            let h = 0;
+            for (let i = 0; i < combined.length; i++) {
+                h = ((h << 5) - h) + combined.charCodeAt(i);
+                h |= 0;
+            }
+            return { 
+                id: 'DEV_' + Math.abs(h).toString(16).padStart(10, '0'), 
+                rawId: dev.id,
+                source: dev.source,
+                salt: salt
+            };
+        }
+
+        function verifySignature(deviceId, sigB64) {
+            try {
+                let sig = fromBase64(sigB64);
+                if (!sig) return false;
+                let pubKey = fromBase64(PUBLIC_KEY_B64);
+                if (!pubKey) return false;
+                let msg = new TextEncoder().encode(deviceId);
+                return nacl.sign.detached.verify(msg, sig, pubKey);
+            } catch(e) { return false; }
+        }
+
+        function getStoredAuth() {
+            let parts = [];
+            for (let k of STORAGE_KEYS) {
+                let v = localStorage.getItem(k);
+                if (v) parts.push(v);
+            }
+            if (parts.length === 0) return null;
+            let counts = {};
+            parts.forEach(p => { counts[p] = (counts[p] || 0) + 1; });
+            let maxCnt = 0, best = null;
+            for (let [key, cnt] of Object.entries(counts)) {
+                if (cnt > maxCnt) { maxCnt = cnt; best = key; }
+            }
+            return maxCnt >= 2 ? best : null;
+        }
+
+        function setStoredAuth(sig) {
+            for (let k of STORAGE_KEYS) {
+                localStorage.setItem(k, sig);
+            }
+        }
+
+        function clearStoredAuth() {
+            for (let k of STORAGE_KEYS) {
+                localStorage.removeItem(k);
+            }
+            localStorage.removeItem('__device_salt');
+            localStorage.removeItem('__auth_bind_time');
+        }
+
+        let _authCache = null;
+        let _authCacheTime = 0;
+        const AUTH_CACHE_TTL = 1000;
+
+        function isActivated() {
+            let now = Date.now();
+            if (_authCache !== null && (now - _authCacheTime) < AUTH_CACHE_TTL) {
+                return _authCache;
+            }
+
+            let storedSig = getStoredAuth();
+            if (!storedSig) {
+                _authCache = false;
+                _authCacheTime = now;
+                return false;
+            }
+
+            let dev = getDeviceIdWithBinding();
+            let valid = verifySignature(dev.id, storedSig);
+            _authCache = valid;
+            _authCacheTime = now;
+            return valid;
+        }
+
+        function refreshAuth() {
+            _authCache = null;
+            return isActivated();
+        }
+
+        function doActivate(inputCode) {
+            let dev = getDeviceIdWithBinding();
+            let code = inputCode.trim();
+            if (!code) {
+                showAuthError('请输入激活码');
+                return false;
+            }
+
+            if (verifySignature(dev.id, code)) {
+                setStoredAuth(code);
+                localStorage.setItem('__auth_bind_time', String(getTimestamp()));
+                _authCache = true;
+                _authCacheTime = Date.now();
+                return true;
+            } else {
+                showAuthError('❌ 激活码无效，请检查后重试');
+                return false;
+            }
+        }
+
+        function showAuthError(msg) {
+            let el = document.getElementById('errorMsg');
+            if (el) { el.textContent = msg; el.style.display = 'block'; }
+            let suc = document.getElementById('successMsg');
+            if (suc) suc.style.display = 'none';
+        }
+
+        function showAuthSuccess(msg) {
+            let el = document.getElementById('successMsg');
+            if (el) { el.textContent = msg; el.style.display = 'block'; }
+            let err = document.getElementById('errorMsg');
+            if (err) err.style.display = 'none';
+        }
+
+        function updateBindInfo() {
+            let el = document.getElementById('bindInfo');
+            if (!el) return;
+            if (isActivated()) {
+                let bindTime = localStorage.getItem('__auth_bind_time');
+                if (bindTime) {
+                    let d = new Date(parseInt(bindTime) * 1000);
+                    el.textContent = '✅ 已激活 · 绑定于 ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+                    el.style.color = '#4caf50';
+                } else {
+                    el.textContent = '✅ 已激活';
+                    el.style.color = '#4caf50';
+                }
+            } else {
+                el.textContent = '🔒 未激活';
+                el.style.color = '#666';
+            }
+        }
+
+        function sealKeyFunctions() {
+            const core = {
+                isActivated: isActivated,
+                doActivate: doActivate,
+                refreshAuth: refreshAuth,
+                getDeviceIdWithBinding: getDeviceIdWithBinding,
+                verifySignature: verifySignature
+            };
+            if (Object.freeze) {
+                Object.freeze(core);
+            }
+            Object.defineProperty(window, '__SECURE_AUTH', {
+                value: core,
+                writable: false,
+                configurable: false
+            });
+        }
+
+        let _authWatchdog = null;
+        let _authWatchdogFailCount = 0;
+        const MAX_AUTH_FAIL = 3;
+
+        function startAuthWatchdog() {
+            if (_authWatchdog) clearInterval(_authWatchdog);
+            _authWatchdog = setInterval(function() {
+                try {
+                    let ok = isActivated();
+                    if (!ok) {
+                        _authWatchdogFailCount++;
+                        if (_authWatchdogFailCount >= MAX_AUTH_FAIL) {
+                            _authWatchdogFailCount = 0;
+                            forceShowAuth();
+                        }
+                    } else {
+                        _authWatchdogFailCount = 0;
+                    }
+                } catch(e) {}
+            }, VALIDITY_CHECK_INTERVAL);
+        }
+
+        function forceShowAuth() {
+            let overlay = document.getElementById('authOverlay');
+            let mainApp = document.getElementById('mainApp');
+            if (overlay) overlay.style.display = 'flex';
+            if (mainApp) mainApp.style.display = 'none';
+            let dev = getDeviceIdWithBinding();
+            let displayEl = document.getElementById('deviceDisplay');
+            if (displayEl) displayEl.textContent = dev.id;
+            updateBindInfo();
+            clearStoredAuth();
+            _authCache = false;
+        }
+
+        function copyDeviceId() {
+            let el = document.getElementById('deviceDisplay');
+            if (!el) return;
+            let text = el.textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    let btn = document.getElementById('copyDeviceBtn');
+                    if (btn) { let orig = btn.textContent; btn.textContent = '✅ 已复制'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            let textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try { document.execCommand('copy'); } catch(e) {}
+            document.body.removeChild(textarea);
+            let btn = document.getElementById('copyDeviceBtn');
+            if (btn) { let orig = btn.textContent; btn.textContent = '✅ 已复制'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+        }
+
+        function initAuthSystem() {
+            let dev = getDeviceIdWithBinding();
+            let displayEl = document.getElementById('deviceDisplay');
+            if (displayEl) displayEl.textContent = dev.id;
+
+            if (isActivated()) {
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'flex';
+                updateBindInfo();
+                startAuthWatchdog();
+                sealKeyFunctions();
+                if (typeof initMainApp === 'function') {
+                    initMainApp();
+                }
+                return;
+            }
+
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+            updateBindInfo();
+
+            document.getElementById('activeBtn').onclick = function() {
+                let inputEl = document.getElementById('keyInput');
+                let code = inputEl.value.trim();
+                if (!code) {
+                    showAuthError('⚠️ 请输入激活码');
+                    return;
+                }
+                let btnText = document.getElementById('activeBtnText');
+                btnText.innerHTML = '<span class="auth-spinner"></span> 验证中...';
+                document.getElementById('activeBtn').disabled = true;
+
+                setTimeout(function() {
+                    let success = doActivate(code);
+                    document.getElementById('activeBtn').disabled = false;
+                    if (success) {
+                        showAuthSuccess('✅ 激活成功！正在进入...');
+                        setTimeout(function() {
+                            document.getElementById('authOverlay').style.display = 'none';
+                            document.getElementById('mainApp').style.display = 'flex';
+                            updateBindInfo();
+                            startAuthWatchdog();
+                            sealKeyFunctions();
+                            if (typeof initMainApp === 'function') {
+                                initMainApp();
+                            }
+                        }, 500);
+                    } else {
+                        btnText.textContent = '🔓 重新激活';
+                    }
+                }, 300);
+            };
+
+            document.getElementById('keyInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('activeBtn').click();
+                }
+            });
+
+            document.getElementById('keyInput').addEventListener('input', function() {
+                document.getElementById('errorMsg').style.display = 'none';
+                document.getElementById('successMsg').style.display = 'none';
+            });
+
+            document.getElementById('copyDeviceBtn').onclick = copyDeviceId;
+        }
+
+        // ============================================================
+        // 🎯 完整功能代码 (来自生意兴隆.html)
+        // ============================================================
+
+        var X = null;
+        var isLocked = false;
+        var intervals = [];
+        var isTradeHistoryLocked = false;
+        var tradeHistoryIntervals = [];
+        var copiedValues = [];
+        var lockSixIntervals = [];
+        var tendencyBase = 0;
+        let shortShortsEnabled = false;
+        let shortShortsBackup = [];
+        let streetComboOriginal = null;
+        let streetComboEnabled = false;
+        const PROCESS_CANDIDATES = ['ipa.store', 'NBA 2K20', 'NBA2K20', 'com.2ksports.nba2k20', 'nba2k20', '2K20'];
+
+        function requireAuth() {
+            if (!isActivated()) {
+                forceShowAuth();
+                return false;
+            }
+            return true;
+        }
+
+        function resolvePointerChain(baseModuleOffset, offsets) {
+            if (!X || X.length === 0) return 0;
+            try {
+                let addr = Number(X[0].start) + baseModuleOffset;
+                for (let i = 0; i < offsets.length; i++) {
+                    addr = Number(h5gg.getValue(addr, 'I64'));
+                    if (!addr) return 0;
+                    addr += offsets[i];
+                }
+                return addr;
+            } catch(e) { return 0; }
+        }
+
+        function setupSixLocks() {
+            if (!X || X.length === 0) return;
+            try {
+                const baseOffset = 0x16E0BA8;
+                const offsetsList = [0x22C, 0x214, 0x16C, 0x154, 0x13C, 0x124];
+                const addresses = offsetsList.map(off => resolvePointerChain(baseOffset, [off]));
+
+                function lock() {
+                    if (!requireAuth()) return;
+                    addresses.forEach(addr => { if (addr) h5gg.setValue(addr, 5, 'I32'); });
+                }
+                lock();
+                let interval = setInterval(lock, 10);
+                lockSixIntervals.push(interval);
+            } catch(e) {}
+        }
+
+        function startHack() {
+            if (typeof h5gg === 'undefined') { console.warn("H5GG 未加载"); return; }
+            if (!requireAuth()) return;
+
+            let retries = 0;
+            const maxRetries = 10;
+            const interval = 500;
+            let foundProcess = null;
+
+            function tryStart() {
+                for (let pname of PROCESS_CANDIDATES) {
+                    try {
+                        let ranges = h5gg.getRangesList(pname);
+                        if (ranges && ranges.length > 0) {
+                            foundProcess = pname;
+                            break;
+                        }
+                    } catch(e) {}
+                }
+
+                if (!foundProcess) {
+                    retries++;
+                    if (retries < maxRetries) {
+                        setTimeout(tryStart, interval);
+                    } else {
+                        alert("无法识别游戏进程，请确保游戏已启动且 H5GG 已附加。");
+                    }
+                    return;
+                }
+
+                X = h5gg.getRangesList(foundProcess);
+                if (!X || X.length === 0) { alert("获取进程信息失败"); return; }
+
+                var base = Number(X[0].start);
+                setupSixLocks();
+
+                let a = resolvePointerChain(0xFB22A8, [0x6E0]);
+                if (a) setInterval(() => { if (requireAuth()) h5gg.setValue(a, 1, 'I32'); }, 10);
+
+                let bBase = base + (0x1060000 + 0xEE98);
+                let dB = Number(h5gg.getValue(bBase, 'I64'));
+                if (dB) {
+                    let b1 = dB + 0x534, b2 = dB + 0x5B8;
+                    setInterval(() => {
+                        if (requireAuth()) {
+                            h5gg.setValue(b1, 130.0, 'F32');
+                            h5gg.setValue(b2, -999999999.0, 'F32');
+                        }
+                    }, 10);
+                }
+
+                let cBase = base + (0x10A0000 + 0xCE28);
+                let pC = Number(h5gg.getValue(cBase, 'I64'));
+                if (pC) {
+                    let l2 = Number(h5gg.getValue(pC, 'I64'));
+                    if (l2) {
+                        let c1 = l2 + 0x140, c2 = l2 + 0x144;
+                        setInterval(() => {
+                            if (requireAuth()) {
+                                h5gg.setValue(c1, 50.0, 'F32');
+                                h5gg.setValue(c2, 0.0, 'F32');
+                            }
+                        }, 10);
+                    }
+                }
+
+                let dBase = base + (0x2670000 + 0x5120);
+                let dD = Number(h5gg.getValue(dBase, 'I64'));
+                if (dD) {
+                    let offs20 = [0x5AC,0x5B0,0x5B4,0x5B8,0x5C0,0x5EC,0x5F0,0x5F4,0x5F8,0x600,0x62C,0x630,0x634,0x638,0x640,0x66C,0x670,0x674,0x678,0x680];
+                    let vals20 = [1,1,1,1,3,1,1,1,1,3,1,1,1,1,3,1,1,1,1,3];
+                    setInterval(() => {
+                        if (requireAuth()) {
+                            for (let i = 0; i < 20; i++) h5gg.setValue(dD + offs20[i], vals20[i], 'F32');
+                        }
+                    }, 10);
+                }
+                console.log("✅ 美式釋意 功能已启动");
+            }
+            tryStart();
+        }
+
+        // ---------- 超短裤 ----------
+        function toggleShortShorts() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            let addrs = [];
+            addrs.push(resolvePointerChain(0x2273058, [0x78, 0x400, 0x88, 0x44]));
+            addrs.push(resolvePointerChain(0x2273058, [0x78, 0x400, 0x88, 0x344]));
+            addrs.push(resolvePointerChain(0x1167A90, [0x598, 0x2D0, 0x88, 0x44]));
+            addrs.push(resolvePointerChain(0x1167A90, [0x598, 0x2D0, 0x88, 0x344]));
+            addrs.push(resolvePointerChain(0x12FFED8, [0x500, 0x5B8, 0x44]));
+            addrs.push(resolvePointerChain(0x12FFED8, [0x500, 0x5B8, 0x344]));
+            let base = Number(X[0].start);
+            let singleAddr = base + 0x16E0BA8 + 0x1B4;
+            addrs = addrs.filter(a => a && a > 0);
+            if (addrs.length === 0 || !singleAddr) {
+                alert("地址获取失败（请进球场）");
+                return;
+            }
+            if (!shortShortsEnabled) {
+                shortShortsBackup = [];
+                for (let i = 0; i < addrs.length; i++) {
+                    shortShortsBackup[i] = h5gg.getValue(addrs[i], 'F32');
+                    h5gg.setValue(addrs[i], -15, 'F32');
+                }
+                shortShortsBackup[6] = h5gg.getValue(singleAddr, 'I32');
+                h5gg.setValue(singleAddr, 0, 'I32');
+                shortShortsEnabled = true;
+                alert("超短裤已开启");
+            } else {
+                for (let i = 0; i < addrs.length; i++) {
+                    h5gg.setValue(addrs[i], shortShortsBackup[i], 'F32');
+                }
+                h5gg.setValue(singleAddr, 5, 'I32');
+                shortShortsEnabled = false;
+                alert("超短裤已关闭");
+            }
+        }
+
+        // ---------- 真实肌肉 ----------
+        function setRealMuscle() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            try {
+                var moduleBase = Number(X[0].start);
+                var ptrBase = moduleBase + 0xF7FD78;
+                var addr = Number(h5gg.getValue(ptrBase, 'I64')) + 0x1CE4;
+                h5gg.setValue(addr, 1, 'I32');
+                alert("✅ 真实肌肉已开启");
+            } catch(e) {
+                alert("❌ 设置失败: " + e.message);
+            }
+        }
+
+        function setStreetScore(val) {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            let addr = resolvePointerChain(0x1563DE0, [0x6E8]);
+            if (!addr) {
+                addr = Number(X[0].start) + 0x1563DE0 + 0x6E8;
+            }
+            if (!addr) {
+                alert("街头分地址失败");
+                return;
+            }
+            h5gg.setValue(addr, val, 'I32');
+            alert("街头分已设置: " + val);
+        }
+
+        function getArmAddr() {
+            if (!X || X.length === 0) return 0;
+            return resolvePointerChain(0xFE7178, [0x1F4]);
+        }
+
+        function loadArm(slider, val) {
+            if (!slider || !val) return;
+            let addr = getArmAddr();
+            if (!addr) return;
+            let v = h5gg.getValue(addr, 'F32');
+            if (v === null || isNaN(v)) return;
+            slider.value = v;
+            val.innerText = Number(v).toFixed(2);
+        }
+
+        function setArm(slider, val) {
+            if (!slider || !val) return;
+            let addr = getArmAddr();
+            if (!addr) return;
+            let v = parseFloat(slider.value);
+            if (isNaN(v)) return;
+            h5gg.setValue(addr, v, 'F32');
+            val.innerText = v.toFixed(2);
+        }
+
+        function toggleStreetCombo() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            let addr = resolvePointerChain(0x270BF38, [0x4B4]);
+            if (!addr) {
+                alert("街头连发地址获取失败");
+                return;
+            }
+            if (!streetComboEnabled) {
+                streetComboOriginal = h5gg.getValue(addr, 'I32');
+                h5gg.setValue(addr, 0, 'I32');
+                streetComboEnabled = true;
+                alert("街头连发已开启");
+            } else {
+                if (streetComboOriginal !== null) h5gg.setValue(addr, streetComboOriginal, 'I32');
+                streetComboEnabled = false;
+                alert("街头连发已关闭");
+            }
+        }
+
+        // ---------- 倾向列表 ----------
+        const tendencyList = [
+            { name: "游戏风格", offset: 0x0, type: "I32", special: true },
+            { name: "防守下扣篮命中率", offset: 0xCC, type: "F32" },
+            { name: "抄截", offset: 0x4, type: "F32" },
+            { name: "强扣命中率", offset: 0xD4, type: "F32" },
+            { name: "助攻", offset: 0xC, type: "F32" },
+            { name: "后方切入", offset: 0xDC, type: "F32" },
+            { name: "速度", offset: 0x14, type: "F32" },
+            { name: "传球", offset: 0xE4, type: "F32" },
+            { name: "控球", offset: 0x1C, type: "F32" },
+            { name: "抢断", offset: 0xEC, type: "F32" },
+            { name: "扣篮意识", offset: 0x24, type: "F32" },
+            { name: "内线强行投篮", offset: 0xFC, type: "F32" },
+            { name: "进攻意识", offset: 0x2C, type: "F32" },
+            { name: "防止上篮强度(1)", offset: 0x104, type: "F32" },
+            { name: "防止上篮强度(2)", offset: 0x10C, type: "F32" },
+            { name: "防守意识", offset: 0x34, type: "F32" },
+            { name: "防止跳投强度(1)", offset: 0x114, type: "F32" },
+            { name: "防止跳投强度(2)", offset: 0x11C, type: "F32" },
+            { name: "进攻篮板", offset: 0x3C, type: "F32" },
+            { name: "侵人犯规", offset: 0x124, type: "F32" },
+            { name: "防守篮板", offset: 0x44, type: "F32" },
+            { name: "撞人犯规", offset: 0x12C, type: "F32" },
+            { name: "力量", offset: 0x4C, type: "F32" },
+            { name: "阻挡犯规", offset: 0x134, type: "F32" },
+            { name: "敏捷", offset: 0x54, type: "F32" },
+            { name: "打手犯规", offset: 0x13C, type: "F32" },
+            { name: "争抢", offset: 0x5C, type: "F32" },
+            { name: "投篮犯规", offset: 0x144, type: "F32" },
+            { name: "稳定", offset: 0x64, type: "F32" },
+            { name: "重伤频率", offset: 0x154, type: "F32" },
+            { name: "持久", offset: 0x6C, type: "F32" },
+            { name: "疲劳率", offset: 0x164, type: "F32" },
+            { name: "体力", offset: 0x74, type: "F32" },
+            { name: "补篮", offset: 0x18C, type: "F32" },
+            { name: "接球", offset: 0x7C, type: "F32" },
+            { name: "抄截运球", offset: 0x19C, type: "F32" },
+            { name: "弹跳", offset: 0x84, type: "F32" },
+            { name: "持球抄截", offset: 0x1A4, type: "F32" },
+            { name: "持球防守", offset: 0x8C, type: "F32" },
+            { name: "阻挡投篮频率", offset: 0x1AC, type: "F32" },
+            { name: "空接命中率", offset: 0x94, type: "F32" },
+            { name: "禁区投篮频率", offset: 0x1B4, type: "F32" },
+            { name: "强扣", offset: 0x9C, type: "F32" },
+            { name: "协防频率", offset: 0x1BC, type: "F32" },
+            { name: "篮下命中率", offset: 0xA4, type: "F32" },
+            { name: "内线投篮频率", offset: 0x1C4, type: "F32" },
+            { name: "近距离命中率", offset: 0xAC, type: "F32" },
+            { name: "近距离投篮频率", offset: 0x1CC, type: "F32" },
+            { name: "中距离命中率", offset: 0xB4, type: "F32" },
+            { name: "中距离投篮频率", offset: 0x1D4, type: "F32" },
+            { name: "三分命中率", offset: 0xBC, type: "F32" },
+            { name: "三分投篮频率", offset: 0x1DC, type: "F32" },
+            { name: "上篮命中率", offset: 0xC4, type: "F32" },
+            { name: "篮下进攻频率", offset: 0x1E4, type: "F32" },
+            { name: "寻找禁区队友", offset: 0x1EC, type: "F32" },
+            { name: "空中接力", offset: 0x1F4, type: "F32" },
+            { name: "尝试灌篮频率", offset: 0x17C, type: "F32" }
+        ];
+
+        function setTendencyBase(value) {
+            tendencyBase = value;
+            if (value) localStorage.setItem('tendencyBase', value.toString());
+            else localStorage.removeItem('tendencyBase');
+        }
+
+        function getTendencyAddress(offset) {
+            if (!tendencyBase) return 0;
+            return tendencyBase + offset;
+        }
+
+        function buildTendencyPanel() {
+            function getAutoTendencyBase() {
+                try {
+                    var X2 = h5gg.getRangesList('NBA 2K20');
+                    if (!X2 || X2.length === 0) return 0;
+                    var base = Number(X2[0].start);
+                    var v1 = Number(h5gg.getValue(base + 0x23E24D0, 'I64'));
+                    if (!v1) return 0;
+                    var v2 = Number(h5gg.getValue(v1 + 0x1B8, 'I64'));
+                    if (!v2) return 0;
+                    var v3 = Number(h5gg.getValue(v2 + 0x0, 'I64'));
+                    if (!v3) return 0;
+                    return v3 + 0x196;
+                } catch(e) {
+                    return 0;
+                }
+            }
+
+            if (!tendencyBase) {
+                tendencyBase = getAutoTendencyBase();
+                if (tendencyBase) {
+                    localStorage.setItem('tendencyBase', tendencyBase.toString());
+                }
+            }
+
+            var targetAddr = tendencyBase ? tendencyBase + 993436 : 0;
+
+            let html = '<div class="style-selector"><label>🎮 游戏风格：</label><select id="gameStyleSelect" ' + (!targetAddr ? "disabled" : "") + '><option value="0">默认</option><option value="1">模拟</option><option value="2">休闲</option><option value="3">自定义</option></select></div><div class="tendency-grid" id="tendencyGrid"></div>';
+            document.getElementById("tendencyPanel").innerHTML = html;
+
+            if (!targetAddr) return;
+
+            document.getElementById("gameStyleSelect").addEventListener('change', function() {
+                var val = parseInt(this.value);
+                try { h5gg.setValue(targetAddr, val, 'I32'); } catch(e) { alert('写入失败: ' + e.message); }
+            });
+
+            const grid = document.getElementById("tendencyGrid");
+            grid.innerHTML = "";
+            tendencyList.forEach(item => {
+                if (item.special) return;
+                const div = document.createElement("div");
+                div.className = "tendency-item";
+                const sliderId = 'tend_slider_' + item.offset;
+                const valueId = 'tend_val_' + item.offset;
+                var addr = targetAddr + item.offset;
+                div.innerHTML = '<span>' + item.name + '</span><div class="tendency-slider"><input type="range" id="' + sliderId + '" min="0" max="1" step="0.01" value="0.5"><span id="' + valueId + '" class="tendency-value">0.50</span></div>';
+                grid.appendChild(div);
+                const slider = document.getElementById(sliderId);
+                const valueSpan = document.getElementById(valueId);
+                if (slider) {
+                    try {
+                        var val = h5gg.getValue(addr, 'F32');
+                        if (val !== null && !isNaN(val)) {
+                            var num = parseFloat(val);
+                            slider.value = Math.min(1, Math.max(0, num));
+                            valueSpan.innerText = num.toFixed(2);
+                        }
+                    } catch(e) {}
+                    slider.addEventListener('input', function() {
+                        var val = parseFloat(this.value);
+                        if (!isNaN(val)) {
+                            try { h5gg.setValue(addr, val, 'F32');
+                                valueSpan.innerText = val.toFixed(2); } catch(e) {}
+                        }
+                    });
+                }
+            });
+
+            try {
+                var curVal = h5gg.getValue(targetAddr, 'I32');
+                if (curVal !== null && curVal >= 0 && curVal <= 3) {
+                    document.getElementById("gameStyleSelect").value = curVal.toString();
+                }
+            } catch(e) {}
+        }
+
+        // ---------- 通用函数 ----------
+        function showContent(contentId) {
+            document.querySelectorAll('.content-pane').forEach(p => p.classList.remove('active-pane'));
+            document.getElementById(contentId).classList.add('active-pane');
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer').classList.remove('open');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        function openDrawer() {
+            document.getElementById('drawer').classList.add('open');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function modifyValue(baseOffset, subOffset, type, inputId, msgId, successMsg) {
+            if (!X || X.length === 0) { document.getElementById(msgId).textContent = '请先进入游戏'; return; }
+            try {
+                const input = document.getElementById(inputId).value.trim();
+                if (!/^-?\d+$/.test(input)) {
+                    document.getElementById(msgId).textContent = '请输入有效数字';
+                    return;
+                }
+                const val = parseInt(input, 10);
+                const address = Number(h5gg.getValue(Number(X[0].start) + baseOffset, 'I64')) + subOffset;
+                h5gg.setValue(address, val, type);
+                document.getElementById(msgId).textContent = successMsg;
+            } catch (e) {
+                document.getElementById(msgId).textContent = '错误: ' + e.message;
+            }
+        }
+
+        function readToInput(baseOffset, subOffset, type, inputId, msgId, successMsg) {
+            if (!X || X.length === 0) { document.getElementById(msgId).textContent = '请先进入游戏'; return; }
+            try {
+                const address = Number(h5gg.getValue(Number(X[0].start) + baseOffset, 'I64')) + subOffset;
+                const val = h5gg.getValue(address, type);
+                document.getElementById(inputId).value = val;
+                document.getElementById(msgId).textContent = successMsg;
+            } catch (e) {
+                document.getElementById(msgId).textContent = '读取失败: ' + e.message;
+            }
+        }
+
+        function setFixedValue(baseOffset, subOffset, value, type, msgId, successMsg) {
+            if (!X || X.length === 0) { document.getElementById(msgId).textContent = '请先进入游戏'; return; }
+            try {
+                const address = Number(h5gg.getValue(Number(X[0].start) + baseOffset, 'I64')) + subOffset;
+                h5gg.setValue(address, value, type);
+                document.getElementById(msgId).textContent = successMsg;
+            } catch (e) {
+                document.getElementById(msgId).textContent = '错误: ' + e.message;
+            }
+        }
+
+        // ---------- 面补面板 ----------
+        function buildFacePanel() {
+            let html = '<div id="message" class="message-text" style="margin-bottom:12px;"></div>';
+            const modifyItems = [
+                { label: "面补", base: 0x117EF90, offset: 0x6E2, type: "I16", id: "face_1" },
+                { label: "身材", base: 0x117F110, offset: 0x700, type: "I16", id: "face_2" },
+                { label: "照片", base: 0x117EE90, offset: 0x6EC, type: "I16", id: "face_3" },
+                { label: "修改名", base: 0x117EE10, offset: 0x6F0, type: "I32", id: "face_4" },
+                { label: "修改姓", base: 0x117EE10, offset: 0x6F4, type: "I32", id: "face_5" },
+                { label: "捏脸头发长度", base: 0x117F890, offset: 0x6E1, type: "I8", id: "face_7" },
+                { label: "选择球队", base: 0x17F9328, offset: 0xE18, type: "I8", id: "face_8" },
+                { label: "切入镜头缩放", base: 0x106E510, offset: 0x5E0, type: "I32", id: "face_9" },
+                { label: "切入镜头高度", base: 0x106E510, offset: 0x5E4, type: "I32", id: "face_10" }
+            ];
+            modifyItems.forEach(item => {
+                html += '<div class="input-row"><span class="row-name">' + item.label + '</span><div class="input-wrapper"><input type="number" id="' + item.id + '" placeholder="数值"><button onclick="modifyValue(' + item.base + ', ' + item.offset + ', \'' + item.type + '\', \'' + item.id + '\', \'message\', \'' + item.label + '修改成功\')">修改</button></div></div>';
+            });
+            const readItems = [
+                { label: "读取名", base: 0x117EE10, offset: 0x6F0, type: "I32", id: "face_read1" },
+                { label: "读取姓", base: 0x117EE10, offset: 0x6F4, type: "I32", id: "face_read2" },
+                { label: "读取面补id", base: 0x117EF90, offset: 0x6E2, type: "I64", id: "face_read3" }
+            ];
+            readItems.forEach(item => {
+                html += '<div class="input-row"><span class="row-name">' + item.label + '</span><div class="input-wrapper"><input type="text" id="' + item.id + '" placeholder="读取后显示" readonly><button onclick="readToInput(' + item.base + ', ' + item.offset + ', \'' + item.type + '\', \'' + item.id + '\', \'message\', \'读取成功\')">读取</button></div></div>';
+            });
+            html += '<div class="action-row"><span class="row-name">捏脸</span><div class="basketball-btn" onclick="anniu3()"><span class="basketball-icon">🏀</span></div></div>';
+            html += '<div class="action-row"><span class="row-name">爆改</span><div class="basketball-btn" onclick="anniu4()"><span class="basketball-icon">🏀</span></div></div>';
+            html += '<div class="action-row"><span class="row-name">锁定捏脸</span><div id="lockToggle" class="toggle-status-btn" onclick="toggleLock()"><span id="lockStatus">❎</span></div></div>';
+            html += '<div class="action-row"><span class="row-name">开启历史交易</span><div id="tradeToggle" class="toggle-status-btn" onclick="toggleTrade()"><span id="tradeStatus">❎</span></div></div>';
+            html += '<div class="action-row"><span class="row-name">开启生涯编辑</span><div class="basketball-btn" onclick="anniu33()"><span class="basketball-icon">🏀</span></div></div>';
+            document.getElementById("facePanel").innerHTML = html;
+            if (isLocked) document.getElementById("lockStatus").innerText = "✅";
+            if (isTradeHistoryLocked) document.getElementById("tradeStatus").innerText = "✅";
+        }
+
+        // ---------- 护具面板 ----------
+        function buildGearPanel() {
+            let html = '<div id="gearMsg" class="message-text" style="margin-bottom:12px;"></div>';
+            const gearItems = [
+                { label: "左护腿", base: 0x117F190, offset: 0x6F8, type: "I8", id: "gear_1" },
+                { label: "右护腿", base: 0x117F190, offset: 0x6EA, type: "I8", id: "gear_2" },
+                { label: "护腿臂", base: 0x117F410, offset: 0x6FD, type: "I8", id: "gear_3" },
+                { label: "袜子", base: 0x117F190, offset: 0x6EC, type: "I8", id: "gear_4" },
+                { label: "护肘", base: 0x117F190, offset: 0x6E6, type: "I8", id: "gear_5" },
+                { label: "护腕左", base: 0x117F190, offset: 0x6E9, type: "I8", id: "gear_6" },
+                { label: "护腕右", base: 0x117F190, offset: 0x6E7, type: "I8", id: "gear_7" },
+                { label: "护腿类型", base: 0x117F190, offset: 0x6EB, type: "I8", id: "gear_8" },
+                { label: "护臂", base: 0x117F490, offset: 0x6F5, type: "I8", id: "gear_9" },
+                { label: "护指1", base: 0x117F190, offset: 0x6E9, type: "I8", id: "gear_10" },
+                { label: "护指2", base: 0x117F190, offset: 0x6F4, type: "I8", id: "gear_11" },
+                { label: "护肘颜色", base: 0x117F190, offset: 0x6ED, type: "I8", id: "gear_12" },
+                { label: "护臂颜色1", base: 0x117F190, offset: 0x6EE, type: "I8", id: "gear_13" },
+                { label: "护臂颜色2", base: 0x117F190, offset: 0x6EF, type: "I8", id: "gear_14" },
+                { label: "左护腕颜色", base: 0x117F190, offset: 0x6F0, type: "I8", id: "gear_15" },
+                { label: "右护腕颜色", base: 0x117F190, offset: 0x6EF, type: "I8", id: "gear_16" },
+                { label: "发带", base: 0x117F190, offset: 0x6E3, type: "I8", id: "gear_17" },
+                { label: "球鞋颜色", base: 0x117F110, offset: 0x6FD, type: "I8", id: "gear_18" },
+                { label: "衣服", base: 0x117F290, offset: 0x6F0, type: "I8", id: "gear_19" }
+            ];
+            gearItems.forEach(item => {
+                html += '<div class="input-row"><span class="row-name">' + item.label + '</span><div class="input-wrapper"><input type="number" id="' + item.id + '" placeholder="数值"><button onclick="modifyValue(' + item.base + ', ' + item.offset + ', \'' + item.type + '\', \'' + item.id + '\', \'gearMsg\', \'' + item.label + '修改成功\')">修改</button></div></div>';
+            });
+            document.getElementById("gearPanel").innerHTML = html;
+        }
+
+        // ---------- 街头球馆面板 ----------
+        function buildCourtPanel() {
+            let html = '<div id="courtMsg" class="message-text" style="margin-bottom:12px;"></div><div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(0,0,0,0.08);"><div style="font-size:15px;font-weight:bold;color:#2e7d32;margin-bottom:8px;">🏟️ 球场修改（球队主场）</div><div class="row" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;"><select id="courtTeamSelect" style="padding:8px 14px;border-radius:30px;border:2px solid #90EE90;background:#ffffff;color:#000;font-size:14px;flex:1;outline:none;"></select></div><div class="status-line" style="font-size:15px;color:#000;padding:4px 0;text-align:center;">当前球队: <b id="courtTeamDisplay" style="color:#2e7d32;">76人</b></div><div class="double-row"><div class="col"><label>球馆值</label><input type="text" id="courtInput" placeholder="输入数字" value="0"><button id="writeCourtBtn">✏️ 写入球馆</button></div><div class="col"><label>地板值</label><input type="text" id="floorInput" placeholder="输入数字" value="0"><button id="writeFloorBtn">✏️ 写入地板</button></div></div></div><div><div style="font-size:15px;font-weight:bold;color:#2e7d32;margin-bottom:8px;">🏀 街头球馆修改</div><div style="margin:8px 0;"><div style="font-size:14px;font-weight:500;color:#000;margin-bottom:4px;">选择球场类型</div><select id="streetCourtTypeSelect" style="width:100%;padding:8px 14px;border-radius:30px;border:2px solid #90EE90;background:#ffffff;color:#000;font-size:14px;outline:none;"><option value="0x51A,0x51C,0x51E|0x546,0x548,0x54A">屋顶</option><option value="0x568,0x56A,0x56C|">沙滩</option><option value="0x58A,0x58C,0x58E|">滑板</option><option value="0x5BE,0x5C0,0x5C2|">上海</option><option value="0x5E2,0x5E4,0x5E6|">广场</option><option value="0x606,0x608,0x60A|">台湾</option></select></div><div class="double-row"><div class="col"><label>街头球馆值</label><input type="text" id="streetCourtInput" placeholder="输入数字" value="0"><button id="writeStreetCourtBtn">✏️ 写入街头球馆</button></div><div class="col"><label>街头地板值</label><input type="text" id="streetFloorInput" placeholder="输入数字" value="0"><button id="writeStreetFloorBtn">✏️ 写入街头地板</button></div></div><div class="hint">选择球场类型自动填充偏移，或手动输入数字后点击写入</div></div>';
+            document.getElementById("courtPanel").innerHTML = html;
+
+            setTimeout(function() {
+                document.querySelectorAll('#courtPanel input').forEach(function(el) {
+                    el.style.cssText = 'border: 2px solid #90EE90 !important; background: #ffffff !important; border-radius: 30px !important; padding: 8px 14px !important; outline: none !important; color: #000 !important; font-size: 14px !important;';
+                });
+                document.querySelectorAll('#courtPanel button').forEach(function(el) {
+                    el.style.cssText = 'border: 2px solid #2e7d32 !important; background: #90EE90 !important; border-radius: 30px !important; padding: 8px 14px !important; font-weight: bold !important; cursor: pointer !important; color: #000 !important; font-size: 14px !important;';
+                });
+                document.querySelectorAll('#courtPanel select').forEach(function(el) {
+                    el.style.cssText = 'border: 2px solid #90EE90 !important; background: #ffffff !important; border-radius: 30px !important; padding: 8px 14px !important; outline: none !important; color: #000 !important; font-size: 14px !important;';
+                });
+            }, 50);
+
+            function readI64(addr) {
+                try { let v = h5gg.getValue(addr, 'I64'); return v === null || v === undefined ? null : BigInt(v); } catch(e) { return null; }
+            }
+            function writeI8(addr, val) {
+                try { h5gg.setValue(Number(addr), val, 'I8'); return true; } catch(e) { return false; }
+            }
+            function writeI16(addr, val) {
+                try { h5gg.setValue(Number(addr), val, 'I16'); return true; } catch(e) { return false; }
+            }
+
+            const courtTeams = [
+                { name: "76人", court: 0x000, floor: 0x02C },
+                { name: "黄蜂", court: 0x07E, floor: 0x0AA },
+                { name: "雄鹿", court: 0x0F0, floor: 0x11C },
+                { name: "公牛", court: 0x164, floor: 0x190 },
+                { name: "骑士", court: 0x1EE, floor: 0x21A },
+                { name: "凯尔特人", court: 0x246, floor: 0x272 },
+                { name: "快船", court: 0x2B6, floor: 0x2D8 },
+                { name: "灰熊", court: 0x328, floor: 0x354 },
+                { name: "老鹰", court: 0x39E, floor: 0x3CA },
+                { name: "热火", court: 0x434, floor: 0x460 },
+                { name: "鹈鹕", court: 0x4AE, floor: 0x4DA },
+                { name: "爵士", court: 0x538, floor: 0x564 },
+                { name: "国王", court: 0x5BA, floor: 0x5E6 },
+                { name: "尼克斯", court: 0x63A, floor: 0x666 },
+                { name: "湖人", court: 0x688, floor: 0x6B4 },
+                { name: "魔术", court: 0x6E0, floor: 0x70C },
+                { name: "独行侠", court: 0x774, floor: 0x7A0 },
+                { name: "篮网", court: 0x7E6, floor: 0x812 },
+                { name: "掘金", court: 0x850, floor: 0x87C },
+                { name: "步行者", court: 0x8D2, floor: 0x8FE },
+                { name: "活塞", court: 0x95A, floor: 0x986 },
+                { name: "猛龙", court: 0x9DA, floor: 0xA06 },
+                { name: "火箭", court: 0xA4A, floor: 0xA76 },
+                { name: "马刺", court: 0xAA0, floor: 0xACC },
+                { name: "太阳", court: 0xB2A, floor: 0xB56 },
+                { name: "雷霆", court: 0xBAE, floor: 0xBDA },
+                { name: "森林狼", court: 0xC2A, floor: 0xC56 },
+                { name: "开拓者", court: 0xCA0, floor: 0xCCC },
+                { name: "勇士", court: 0xD10, floor: 0xD3C },
+                { name: "奇才", court: 0xD80, floor: 0xDAC }
+            ];
+
+            let courtCurrentIdx = 0;
+            const courtMsg = document.getElementById('courtMsg');
+            const courtSelect = document.getElementById('courtTeamSelect');
+            const courtDisplay = document.getElementById('courtTeamDisplay');
+            const courtInput = document.getElementById('courtInput');
+            const floorInput = document.getElementById('floorInput');
+            const writeCourtBtn = document.getElementById('writeCourtBtn');
+            const writeFloorBtn = document.getElementById('writeFloorBtn');
+
+            courtTeams.forEach((t, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = t.name;
+                courtSelect.appendChild(opt);
+            });
+            courtSelect.value = 0;
+
+            function getCourtBaseAddr() {
+                if (!X || X.length === 0) return null;
+                try {
+                    let base = BigInt(X[0].start);
+                    let v1 = readI64(base + BigInt(0x23E24D0));
+                    if (!v1) return null;
+                    let v2 = readI64(v1 + BigInt(0x208));
+                    if (!v2) return null;
+                    let v3 = readI64(v2 + BigInt(0x6A8));
+                    if (!v3) return null;
+                    return v3 + BigInt(0x698);
+                } catch(e) { return null; }
+            }
+
+            function getCourtAddr() {
+                let base = getCourtBaseAddr();
+                if (!base) return null;
+                return base + BigInt(courtTeams[courtCurrentIdx].court);
+            }
+
+            function getFloorAddr() {
+                let base = getCourtBaseAddr();
+                if (!base) return null;
+                return base + BigInt(courtTeams[courtCurrentIdx].floor);
+            }
+
+            function getStreetBaseAddr() {
+                if (!X || X.length === 0) return null;
+                try {
+                    let base = BigInt(X[0].start);
+                    let v1 = readI64(base + BigInt(0x1806D48));
+                    if (!v1) return null;
+                    let v2 = readI64(v1 + BigInt(0xB0));
+                    if (!v2) return null;
+                    return v2;
+                } catch(e) { return null; }
+            }
+
+            const courtCharMap = { '0':48, '1':49, '2':50, '3':51, '4':52, '5':53, '6':54, '7':55, '8':56, '9':57 };
+
+            function writeCourtSingle(addr, str, name) {
+                if (!str) { courtMsg.textContent = '⚠️ 请输入' + name + '值'; return; }
+                for (let ch of str) {
+                    if (!courtCharMap[ch]) {
+                        courtMsg.textContent = '❌ 非法字符: "' + ch + '" (仅支持数字 0-9)';
+                        return;
+                    }
+                }
+                if (!addr) { courtMsg.textContent = '❌ 地址无效'; return; }
+                let cur = addr;
+                for (let i = 0; i < str.length; i++) {
+                    if (!writeI16(cur, courtCharMap[str[i]])) {
+                        courtMsg.textContent = '❌ ' + name + '写入失败';
+                        return;
+                    }
+                    cur += 2n;
+                }
+                if (!writeI16(cur, 0)) {
+                    courtMsg.textContent = '❌ ' + name + '补0失败';
+                    return;
+                }
+                courtMsg.textContent = '✅ ' + name + ' "' + str + '" 写入成功';
+            }
+
+            courtSelect.addEventListener('change', () => {
+                courtCurrentIdx = parseInt(courtSelect.value);
+                const team = courtTeams[courtCurrentIdx];
+                courtDisplay.textContent = team.name;
+                courtMsg.textContent = '✅ 已切换到 ' + team.name;
+            });
+
+            document.getElementById('streetCourtTypeSelect').addEventListener('change', function() {
+                const parts = this.value.split('|');
+                document.getElementById('streetCourtInput').value = parts[0];
+                document.getElementById('streetFloorInput').value = parts[1];
+                courtMsg.textContent = '✅ 已选择 ' + this.options[this.selectedIndex].text + ' (球馆偏移:' + parts[0] + ', 地板偏移:' + parts[1] + ')';
+            });
+
+            writeCourtBtn.addEventListener('click', () => {
+                writeCourtSingle(getCourtAddr(), courtInput.value.trim(), '球馆');
+            });
+
+            writeFloorBtn.addEventListener('click', () => {
+                writeCourtSingle(getFloorAddr(), floorInput.value.trim(), '地板');
+            });
+
+            document.getElementById('writeStreetCourtBtn').addEventListener('click', function() {
+                const str = document.getElementById('streetCourtInput').value.trim();
+                if (!str) { courtMsg.textContent = '⚠️ 请输入数字'; return; }
+                for (let ch of str) {
+                    if (ch < '0' || ch > '9') {
+                        courtMsg.textContent = '❌ 只支持数字 0-9';
+                        return;
+                    }
+                }
+                const baseAddr = getStreetBaseAddr();
+                if (!baseAddr) { courtMsg.textContent = '❌ 街头球馆基址无效'; return; }
+                const sel = document.getElementById('streetCourtTypeSelect');
+                const parts = sel.value.split('|');
+                const offsets = parts[0].split(',');
+                let successCount = 0;
+                offsets.forEach((offStr, index) => {
+                    if (offStr.trim() === '') return;
+                    const off = parseInt(offStr);
+                    if (!isNaN(off)) {
+                        const addr = baseAddr + BigInt(off);
+                        const ch = index < str.length ? str[index] : '0';
+                        const val = 48 + parseInt(ch);
+                        if (writeI8(addr, val)) successCount++;
+                    }
+                });
+                courtMsg.textContent = '✅ 街头球馆写入成功 (' + successCount + '/' + offsets.length + ' 个地址)';
+            });
+
+            document.getElementById('writeStreetFloorBtn').addEventListener('click', function() {
+                const str = document.getElementById('streetFloorInput').value.trim();
+                if (!str) { courtMsg.textContent = '⚠️ 请输入数字'; return; }
+                for (let ch of str) {
+                    if (ch < '0' || ch > '9') {
+                        courtMsg.textContent = '❌ 只支持数字 0-9';
+                        return;
+                    }
+                }
+                const baseAddr = getStreetBaseAddr();
+                if (!baseAddr) { courtMsg.textContent = '❌ 街头球馆基址无效'; return; }
+                const sel = document.getElementById('streetCourtTypeSelect');
+                const parts = sel.value.split('|');
+                const offsets = parts[1] ? parts[1].split(',') : [];
+                if (offsets.length === 0 || (offsets.length === 1 && offsets[0] === '')) {
+                    courtMsg.textContent = '⚠️ 当前球场类型没有地板地址';
+                    return;
+                }
+                let successCount = 0;
+                offsets.forEach((offStr, index) => {
+                    if (offStr.trim() === '') return;
+                    const off = parseInt(offStr);
+                    if (!isNaN(off)) {
+                        const addr = baseAddr + BigInt(off);
+                        const ch = index < str.length ? str[index] : '0';
+                        const val = 48 + parseInt(ch);
+                        if (writeI8(addr, val)) successCount++;
+                    }
+                });
+                courtMsg.textContent = '✅ 街头地板写入成功 (' + successCount + '/' + offsets.length + ' 个地址)';
+            });
+
+            courtInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') writeCourtBtn.click(); });
+            floorInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') writeFloorBtn.click(); });
+            document.getElementById('streetCourtInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') document.getElementById('writeStreetCourtBtn').click();
+            });
+            document.getElementById('streetFloorInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') document.getElementById('writeStreetFloorBtn').click();
+            });
+
+            const team = courtTeams[0];
+            courtDisplay.textContent = team.name;
+            courtMsg.textContent = '✅ 已就绪';
+        }
+
+        // ---------- 球队Logo面板 ----------
+        function buildLogoPanel() {
+            let html = '<div id="logoMsg" class="message-text" style="margin-bottom:12px;"></div><div class="logo-row"><select id="logoTeamSelect"></select></div><div class="logo-status">当前球队: <b id="logoTeamDisplay">76人</b></div><div class="logo-row"><input type="text" id="logoInputStr" placeholder="输入数字，如 00123" style="flex:1;" value="111"><button id="logoWriteBtn">✏️ 写入</button><button id="logoReadBtn">📖 读取</button></div><div class="hint">只支持数字 0-9</div><div id="logoReadResult" style="margin-top:8px;font-size:13px;color:#888;display:none;"></div>';
+            document.getElementById("logoPanel").innerHTML = html;
+
+            const logoTeams = [
+                { name: "76人", offset: 0x00 },
+                { name: "雄鹿", offset: 0x2A },
+                { name: "公牛", offset: 0x52 },
+                { name: "骑士", offset: 0x82 },
+                { name: "凯尔特人", offset: 0xAC },
+                { name: "快船", offset: 0xF6 },
+                { name: "灰熊", offset: 0x12C },
+                { name: "老鹰", offset: 0x15C },
+                { name: "热火", offset: 0x186 },
+                { name: "黄蜂", offset: 0x1AC },
+                { name: "爵士", offset: 0x1E0 },
+                { name: "国王", offset: 0x20E },
+                { name: "尼克斯", offset: 0x238 },
+                { name: "湖人", offset: 0x278 },
+                { name: "魔术", offset: 0x294 },
+                { name: "独行侠", offset: 0x2C6 },
+                { name: "篮网", offset: 0x2EA },
+                { name: "掘金", offset: 0x314 },
+                { name: "步行者", offset: 0x352 },
+                { name: "鹈鹕", offset: 0x382 },
+                { name: "活塞", offset: 0x3C4 },
+                { name: "猛龙", offset: 0x3F4 },
+                { name: "火箭", offset: 0x424 },
+                { name: "马刺", offset: 0x450 },
+                { name: "太阳", offset: 0x476 },
+                { name: "雷霆", offset: 0x490 },
+                { name: "森林狼", offset: 0x4E4 },
+                { name: "开拓者", offset: 0x52A },
+                { name: "勇士", offset: 0x576 },
+                { name: "奇才", offset: 0x5A8 }
+            ];
+
+            let logoCurrentIdx = 0;
+            const logoSelect = document.getElementById('logoTeamSelect');
+            const logoDisplay = document.getElementById('logoTeamDisplay');
+            const logoInput = document.getElementById('logoInputStr');
+            const logoWriteBtn = document.getElementById('logoWriteBtn');
+            const logoReadBtn = document.getElementById('logoReadBtn');
+            const logoMsg = document.getElementById('logoMsg');
+            const logoResult = document.getElementById('logoReadResult');
+
+            logoTeams.forEach((t, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = t.name;
+                logoSelect.appendChild(opt);
+            });
+            logoSelect.value = 0;
+
+            function readI64(addr) {
+                try { let v = h5gg.getValue(addr, 'I64'); return v === null || v === undefined ? null : BigInt(v); } catch(e) { return null; }
+            }
+
+            function getLogoAddr() {
+                if (!X || X.length === 0) return null;
+                try {
+                    let base = BigInt(X[0].start);
+                    let v1 = readI64(base + BigInt(0x23E24D0));
+                    if (!v1) return null;
+                    let v2 = readI64(v1 + BigInt(0xC8));
+                    if (!v2) return null;
+                    let v3 = readI64(v2 + BigInt(0xA0));
+                    if (!v3) return null;
+                    return v3 + BigInt(0x14) + BigInt(logoTeams[logoCurrentIdx].offset);
+                } catch(e) { return null; }
+            }
+
+            function readI16(addr) {
+                try { return h5gg.getValue(Number(addr), 'I16'); } catch(e) { return null; }
+            }
+            function writeI16(addr, val) {
+                try { h5gg.setValue(Number(addr), val, 'I16'); return true; } catch(e) { return false; }
+            }
+
+            const logoCharMap = { '0':48, '1':49, '2':50, '3':51, '4':52, '5':53, '6':54, '7':55, '8':56, '9':57 };
+
+            function logoDoRead() {
+                const addr = getLogoAddr();
+                if (!addr) { logoMsg.textContent = '❌ 地址无效'; return; }
+                let html = '<div style="font-size:14px;color:#000;font-family:monospace;">';
+                let hasData = false;
+                for (let i = 0; i < 6; i++) {
+                    let curAddr = addr + BigInt(i * 2);
+                    let val = readI16(curAddr);
+                    if (val !== null && val !== undefined) {
+                        let ch = (val >= 32 && val <= 126) ? String.fromCharCode(val) : '?';
+                        html += '<div>' + (i+1) + ': ' + val + ' (' + ch + ')</div>';
+                        hasData = true;
+                    }
+                }
+                html += '</div>';
+                if (!hasData) html = '<div style="color:#888;">未读取到数据</div>';
+                logoResult.innerHTML = html;
+                logoResult.style.display = 'block';
+                logoMsg.textContent = '✅ 读取完成';
+            }
+
+            function logoWriteString() {
+                const str = logoInput.value.trim();
+                if (!str) { logoMsg.textContent = '⚠️ 请输入字符串'; return; }
+                for (let ch of str) {
+                    if (!logoCharMap[ch]) {
+                        logoMsg.textContent = '❌ 非法字符: "' + ch + '" (仅支持数字 0-9)';
+                        return;
+                    }
+                }
+                const addr = getLogoAddr();
+                if (!addr) { logoMsg.textContent = '❌ 目标地址无效'; return; }
+                let cur = addr;
+                for (let i = 0; i < str.length; i++) {
+                    if (!writeI16(cur, logoCharMap[str[i]])) {
+                        logoMsg.textContent = '❌ 写入第 ' + (i+1) + ' 个字符失败';
+                        return;
+                    }
+                    cur += 2n;
+                }
+                if (!writeI16(cur, 0)) {
+                    logoMsg.textContent = '❌ 写入结束符失败';
+                    return;
+                }
+                logoMsg.textContent = '✅ 字符串 "' + str + '" 写入成功';
+                logoDoRead();
+            }
+
+            function refreshLogoDisplay() {
+                logoDisplay.textContent = logoTeams[logoCurrentIdx].name;
+                logoMsg.textContent = '✅ 已就绪';
+            }
+
+            logoSelect.addEventListener('change', () => {
+                logoCurrentIdx = parseInt(logoSelect.value);
+                refreshLogoDisplay();
+            });
+
+            logoWriteBtn.addEventListener('click', logoWriteString);
+            logoReadBtn.addEventListener('click', logoDoRead);
+            logoInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') logoWriteString(); });
+
+            setTimeout(refreshLogoDisplay, 300);
+        }
+
+        // ---------- 卫衣面板 ----------
+        function buildHoodiePanel() {
+            let html = '<div id="hoodie_msg" class="message-text" style="margin-bottom:12px;"></div><div class="action-row"><span class="row-name">复制卫衣</span><div class="basketball-btn" onclick="anniu49()"><span class="basketball-icon">🏀</span></div></div><div class="action-row"><span class="row-name">粘贴卫衣</span><div class="basketball-btn" onclick="anniu50()"><span class="basketball-icon">🏀</span></div></div><div class="action-row"><span class="row-name">改完卫衣后点击一下</span><div class="basketball-btn" onclick="anniu52()"><span class="basketball-icon">🏀</span></div></div><div class="action-row"><span class="row-name">复制球鞋</span><div class="basketball-btn" onclick="anniu46()"><span class="basketball-icon">🏀</span></div></div><div class="action-row"><span class="row-name">粘贴球鞋</span><div class="basketball-btn" onclick="anniu47()"><span class="basketball-icon">🏀</span></div></div><div class="action-row"><span class="row-name">改完球鞋后点击一下</span><div class="basketball-btn" onclick="anniu48()"><span class="basketball-icon">🏀</span></div></div>';
+            document.getElementById("hoodiePanel").innerHTML = html;
+        }
+
+        // ---------- 姓名修改面板 ----------
+        function buildNamePanel() {
+            let html = '<p>无人扶我青云志，我自踏雪至山巅</p><div class="action-row"><span class="row-name">先点击这个再修改名字</span><div class="basketball-btn" onclick="anniu53()"><span class="basketball-icon">🏀</span></div></div><div class="dual-input-section"><div class="input-group"><input type="text" id="input53" placeholder="输入姓氏内容"></div><div class="input-group"><input type="text" id="input54" placeholder="输入名字内容"></div></div><div class="action-row"><span class="row-name">一键修改姓名</span><div class="basketball-btn" onclick="modifyBoth()"><span class="basketball-icon">🏀</span></div></div><p id="funMessage" class="message-text"></p>';
+            document.getElementById("namePanel").innerHTML = html;
+        }
+
+        // ---------- 画质面板 ----------
+        function buildQualityPanel() {
+            let html = '<div id="qualityMsg" class="message-text"></div><div class="switch-wrapper"><span class="switch-label">生涯流汗开关</span><label class="switch"><input type="checkbox" id="toggleSwitch"><span class="slider round"></span><span id="switchStatus" class="status-text"></span></label></div><div class="switch-wrapper" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.08);"><span class="switch-label">💪 真实肌肉</span><button onclick="setRealMuscle()" style="padding:6px 20px;border-radius:30px;border:2px solid #2e7d32;background:#90EE90;font-weight:bold;cursor:pointer;font-size:14px;color:#000;transition:0.2s;" onmouseover="this.style.background=\'#7bda7b\'" onmouseout="this.style.background=\'#90EE90\'">点击开启</button></div>';
+            document.getElementById("qualityPanel").innerHTML = html;
+
+            const toggleSwitch = document.getElementById('toggleSwitch');
+            const switchStatus = document.getElementById('switchStatus');
+            if (toggleSwitch) {
+                toggleSwitch.addEventListener('change', function() {
+                    if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+                    const baseAddress = 0x116E518;
+                    const offset = 0x600;
+                    const finalAddress = Number(h5gg.getValue(Number(X[0].start) + baseAddress, 'I64')) + offset;
+                    if (this.checked) { h5gg.setValue(finalAddress, 0, 'I32');
+                        switchStatus.textContent = "开启"; } else { h5gg.setValue(finalAddress, 1, 'I32');
+                        switchStatus.textContent = "关闭"; }
+                });
+            }
+        }
+
+        // ---------- 设置面板 ----------
+        function buildSettingsPanel() {
+            let html = '<div class="settings-group"><h3>🎨 界面设置</h3><div class="setting-row"><span class="setting-label">🔤 字体大小</span><div class="setting-control"><select id="fontSelect"><option value="normal">标准</option><option value="small">小巧</option><option value="large">大号</option></select></div></div></div><div class="settings-group"><h3>👤 玩家档案</h3><div class="setting-row"><span class="setting-label">🏷️ 昵称</span><div class="setting-control"><input type="text" id="nicknameInput" placeholder="街头绰号"><button id="saveNicknameBtn">保存</button></div></div><div class="setting-row"><span class="setting-label">📢 通知提醒</span><div class="setting-control"><div id="notifyToggle" class="toggle-switch"></div></div></div></div><div class="settings-group"><h3>🎮 超广角调节</h3>';
+            for (let i = 1; i <= 10; i++) {
+                html += '<div class="action-row"><span class="row-name">超广角' + i + '</span><div class="basketball-btn" onclick="anniu' + (35 + i) + '()"><span class="basketball-icon">🏀</span></div></div>';
+            }
+            html += '</div><div class="settings-group"><h3>👖 服装修改</h3><div class="action-row"><span class="row-name">超短裤</span><div class="basketball-btn" onclick="toggleShortShorts()"><span class="basketball-icon">🏀</span></div></div></div><div class="settings-group"><h3>🎮 功能开关</h3><div class="action-row"><span class="row-name">街头连发</span><div class="basketball-btn" onclick="toggleStreetCombo()"><span class="basketball-icon">🏀</span></div></div></div><div class="settings-group"><h3>🏀 街头百分</h3><div class="action-row"><span class="row-name">7分</span><div class="basketball-btn" onclick="setStreetScore(7)">🏀</div></div><div class="action-row"><span class="row-name">11分</span><div class="basketball-btn" onclick="setStreetScore(11)">🏀</div></div><div class="action-row"><span class="row-name">21分</span><div class="basketball-btn" onclick="setStreetScore(21)">🏀</div></div><div class="action-row"><span class="row-name">100分</span><div class="basketball-btn" onclick="setStreetScore(100)">🏀</div></div><div class="action-row"><span class="row-name">200分</span><div class="basketball-btn" onclick="setStreetScore(200)">🏀</div></div></div><div class="settings-group"><h3>💪 手臂长度</h3><div class="tendency-item"><span>手臂</span><div class="tendency-slider"><input type="range" id="armSlider" min="0.01" max="2" step="0.01"><span id="armVal" class="tendency-value">0</span></div></div></div><div class="settings-group"><h3>⚙️ 其他</h3><div class="setting-row"><span class="setting-label">🗑️ 清理缓存</span><button id="clearCacheBtn">一键清理</button></div><div class="setting-row"><span class="setting-label">🚪 退出插件</span><button id="exitPluginBtn">退出插件</button></div><div class="setting-row"><span class="setting-label">版本</span><span>美式释意 v2.6.0</span></div></div>';
+            document.getElementById("settingsPanel").innerHTML = html;
+
+            setTimeout(() => {
+                let a = document.getElementById("armSlider");
+                let av = document.getElementById("armVal");
+                if (a && av) {
+                    loadArm(a, av);
+                    a.oninput = () => setArm(a, av);
+                }
+            }, 300);
+
+            document.getElementById("exitPluginBtn").addEventListener('click', () => {
+                try { h5gg.exit(); } catch (e) { alert("退出失败"); }
+            });
+        }
+
+        // ---------- 原有功能函数 ----------
+        function anniu3() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            let addr = Number(h5gg.getValue(Number(X[0].start) + 0x117EE90, 'I64')) + 0x6F1;
+            h5gg.setValue(addr, 255, 'I8');
+            document.getElementById('message').textContent = '捏脸成功';
+        }
+
+        function anniu4() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            const baseOffsets = [0x117F510, 0x117F590, 0x117F610, 0x117F690];
+            const subOffsets = [0x6EC, 0x6F0, 0x6F4, 0x6F8];
+            baseOffsets.forEach(base => { subOffsets.forEach(sub => { const addr = Number(h5gg.getValue(Number(X[0].start) + base, 'I64')) + sub;
+                    h5gg.setValue(addr, -1, 'I32'); }); });
+            document.getElementById('message').textContent = '爆改成功';
+        }
+
+        function toggleLock() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            var offsets = [
+                [0x117EE10, 0x6F0], [0x117EE10, 0x6F4], [0x117F110, 0x700], [0x117F210, 0x6F8], [0x117F210, 0x700],
+                [0x117F290, 0x6E8], [0x117F690, 0x6F8], [0x117F690, 0x700], [0x117F710, 0x6E8], [0x117F710, 0x6F0],
+                [0x117F710, 0x6F8], [0x117F710, 0x700], [0x117F790, 0x6E8], [0x117F790, 0x6F0], [0x117F790, 0x6F8],
+                [0x117F790, 0x700], [0x117F810, 0x6E8], [0x117F810, 0x6F0], [0x117F810, 0x6F8], [0x117F810, 0x700],
+                [0x117F890, 0x6E8]
+            ];
+            if (!isLocked) {
+                for (var i = 0; i < offsets.length; i++) {
+                    var baseAddr = Number(X[0].start) + offsets[i][0];
+                    var finalAddr = Number(h5gg.getValue(baseAddr, 'I64')) + offsets[i][1];
+                    var currentValue = h5gg.getValue(finalAddr, 'I64');
+                    if (currentValue !== null) {
+                        let intervalId = setInterval((function(a, v) { return function() { h5gg.setValue(a, v, 'I64'); }; })(finalAddr, currentValue),
+                        10);
+                        intervals.push(intervalId);
+                    }
+                }
+                isLocked = true;
+                document.getElementById("lockStatus").innerHTML = "✅";
+                alert("捏脸数值已锁定！");
+            } else {
+                for (var j = 0; j < intervals.length; j++) clearInterval(intervals[j]);
+                intervals = [];
+                isLocked = false;
+                document.getElementById("lockStatus").innerHTML = "❎";
+                alert("捏脸数值已解锁！");
+            }
+        }
+
+        function toggleTrade() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            var baseAddress = Number(X[0].start) + 0x17F9328;
+            var offset1 = 0xE10, offset2 = 0xE28;
+            var addr1 = Number(h5gg.getValue(baseAddress, 'I64')) + offset1;
+            var addr2 = Number(h5gg.getValue(baseAddress, 'I64')) + offset2;
+            var originalValue1, originalValue2;
+            if (!isTradeHistoryLocked) {
+                originalValue1 = h5gg.getValue(addr1, 'I32');
+                originalValue2 = h5gg.getValue(addr2, 'I32');
+                let interval1 = setInterval(() => h5gg.setValue(addr1, 5, 'I32'), 10);
+                let interval2 = setInterval(() => h5gg.setValue(addr2, 240, 'I32'), 10);
+                tradeHistoryIntervals.push(interval1, interval2);
+                isTradeHistoryLocked = true;
+                document.getElementById("tradeStatus").innerHTML = "✅";
+                alert("历史交易已开启！");
+            } else {
+                for (var j = 0; j < tradeHistoryIntervals.length; j++) clearInterval(tradeHistoryIntervals[j]);
+                tradeHistoryIntervals = [];
+                if (originalValue1 !== undefined) h5gg.setValue(addr1, originalValue1, 'I32');
+                if (originalValue2 !== undefined) h5gg.setValue(addr2, originalValue2, 'I32');
+                isTradeHistoryLocked = false;
+                document.getElementById("tradeStatus").innerHTML = "❎";
+                alert("历史交易已关闭！");
+            }
+        }
+
+        function anniu33() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            var baseAddress = Number(X[0].start) + 0x17F9328;
+            var modifications = [
+                { offset: 0xE14, value: 2 }, { offset: 0xE10, value: 2 },
+                { offset: 0xE20, value: 30 }, { offset: 0xE24, value: 31 }, { offset: 0xE28, value: 31 }
+            ];
+            modifications.forEach(mod => {
+                let addr = Number(h5gg.getValue(baseAddress, 'I64')) + mod.offset;
+                h5gg.setValue(addr, mod.value, 'I32');
+            });
+            alert("生涯编辑已开启！");
+        }
+
+        for (let i = 36; i <= 45; i++) {
+            window['anniu' + i] = function(i) {
+                return function() {
+                    if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+                    var base = Number(X[0].start) + 0xF25E28;
+                    var addr = Number(h5gg.getValue(base, 'I64')) + 0x1D50;
+                    var values = [0.05555555597, 0.04555555433, 0.03555555642, 0.02555555664, 0.01555555593, 0.01455555577, 0.01355555556,
+                        0.01255555637, 0.01155555621, 0.01055555621
+                    ];
+                    h5gg.setValue(addr, values[i - 36], 'F32');
+                };
+            }(i);
+        }
+
+        function anniu46() { if (!X || X.length === 0) { alert("请先进入游戏"); return; } copiedValues = [];
+            var off = [[0x248ED00, 0x498], [0x248ED00, 0x49C], [0x248ED00, 0x4A0], [0x248ED00, 0x4A4]];
+            for (var i = 0; i < off.length; i++) { var a = Number(X[0].start) + off[i][0]; var addr = Number(h5gg.getValue(a, 'I64')) + off[i][1]; var v = h5gg.getValue(addr, 'I64'); if (v !== null) copiedValues.push(v); }
+            alert("已复制球鞋！"); }
+
+        function anniu47() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            var off = [[0x117F110, 0x6E8], [0x117F110, 0x6EC], [0x117F110, 0x6F0], [0x117F110, 0x6F4]];
+            if (copiedValues.length > 0) { for (var i = 0; i < off.length; i++) { var a = Number(X[0].start) + off[i][0]; var addr = Number(h5gg.getValue(a, 'I64')) + off[i][1]; if (copiedValues[i] !== undefined) h5gg.setValue(addr, copiedValues[i], 'I64'); }
+                alert("粘贴成功！"); } else alert("请先复制球鞋！");
+        }
+
+        function anniu48() { if (!X || X.length === 0) { alert("请先进入游戏"); return; } setFixedValue(0x117EE90, 0x6F0, 184, 'I8', 'hoodie_msg', '成功'); }
+
+        function anniu49() { if (!X || X.length === 0) { alert("请先进入游戏"); return; } copiedValues = [];
+            var off = [[0x248ED00, 0x550], [0x248ED00, 0x554]];
+            for (var i = 0; i < off.length; i++) { var a = Number(X[0].start) + off[i][0]; var addr = Number(h5gg.getValue(a, 'I64')) + off[i][1]; var v = h5gg.getValue(addr, 'I64'); if (v !== null) copiedValues.push(v); }
+            alert("已复制卫衣！"); }
+
+        function anniu50() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            var off = [[0x117F390, 0x700], [0x117F390, 0x704]];
+            if (copiedValues.length > 0) { for (var i = 0; i < off.length; i++) { var a = Number(X[0].start) + off[i][0]; var addr = Number(h5gg.getValue(a, 'I64')) + off[i][1]; if (copiedValues[i] !== undefined) h5gg.setValue(addr, copiedValues[i], 'I64'); }
+                alert("粘贴成功！"); } else alert("请先复制卫衣！");
+        }
+
+        function anniu52() { if (!X || X.length === 0) { alert("请先进入游戏"); return; } setFixedValue(0x117F290, 0x6F0, 4, 'I8', 'hoodie_msg', '成功'); }
+
+        function anniu53() { if (!X || X.length === 0) { alert("请先进入游戏"); return; } const base = 0x117EE10; const offs = [0x6F0, 0x6F4]; offs.forEach(o => { const addr = Number(h5gg.getValue(Number(X[0].start) + base, 'I64')) + o;
+                    h5gg.setValue(addr, 0, 'I32'); });
+            document.getElementById('funMessage').textContent = '名和姓已清零'; }
+
+        function modifySurname() { if (!X || X.length === 0) { alert("请先进入游戏"); return; } try { const input = document.getElementById("input53").value; if (!input) return; const basePtr = Number(X[0].start) + 0x117EE10; const ptrValue = Number(h5gg.getValue(basePtr, 'I64')) + 0x6E8; const address = BigInt(0x100000000) + BigInt(h5gg.getValue(ptrValue, 'I32')); let cur = address; for (let i = 0; i < input.length; i++) { h5gg.setValue(cur, input.charCodeAt(i), 'I16');
+                    cur += BigInt(2);
+                    h5gg.setValue(cur, 0, 'I16'); } } catch (e) {} }
+
+        function modifyName() { if (!X || X.length === 0) { alert("请先进入游戏"); return; } try { const input = document.getElementById("input54").value; if (!input) return; const basePtr = Number(X[0].start) + 0x117ED90; const ptrValue = Number(h5gg.getValue(basePtr, 'I64')) + 0x700; const address = BigInt(0x100000000) + BigInt(h5gg.getValue(ptrValue, 'I32')); let cur = address; for (let i = 0; i < input.length; i++) { h5gg.setValue(cur, input.charCodeAt(i), 'I16');
+                    cur += BigInt(2);
+                    h5gg.setValue(cur, 0, 'I16'); } } catch (e) {} }
+
+        function modifyBoth() { if (!X || X.length === 0) { alert("请先进入游戏"); return; } modifySurname();
+            modifyName();
+            alert("姓名修改已完成！"); }
+
+        // ==================== 球衣功能 ====================
+        const jerseyTeams = [
+            { name: "76人", home: -0x120, away: -0x114 },
+            { name: "黄蜂", home: -0x108, away: -0x0FC },
+            { name: "雄鹿", home: -0x0F0, away: -0x0E4 },
+            { name: "公牛", home: -0x0D8, away: -0x0CC },
+            { name: "骑士", home: -0x0C0, away: -0x0B4 },
+            { name: "凯尔特人", home: -0x0A8, away: -0x09C },
+            { name: "快船", home: -0x090, away: -0x084 },
+            { name: "灰熊", home: -0x078, away: -0x06C },
+            { name: "老鹰", home: -0x060, away: -0x054 },
+            { name: "热火", home: -0x048, away: -0x03C },
+            { name: "爵士", home: -0x030, away: -0x024 },
+            { name: "国王", home: -0x018, away: -0x00C },
+            { name: "尼克斯", home: 0x000, away: 0x00C },
+            { name: "湖人", home: 0x018, away: 0x024 },
+            { name: "魔术", home: 0x030, away: 0x03C },
+            { name: "独行侠", home: 0x048, away: 0x054 },
+            { name: "篮网", home: 0x060, away: 0x06C },
+            { name: "掘金", home: 0x078, away: 0x084 },
+            { name: "步行者", home: 0x090, away: 0x09C },
+            { name: "鹈鹕", home: 0x0A8, away: 0x0B4 },
+            { name: "活塞", home: 0x0C0, away: 0x0CC },
+            { name: "猛龙", home: 0x0D8, away: 0x0E4 },
+            { name: "火箭", home: 0x0F0, away: 0x0FC },
+            { name: "马刺", home: 0x108, away: 0x114 },
+            { name: "太阳", home: 0x120, away: 0x12C },
+            { name: "雷霆", home: 0x138, away: 0x144 },
+            { name: "森林狼", home: 0x150, away: 0x15C },
+            { name: "开拓者", home: 0x168, away: 0x174 },
+            { name: "勇士", home: 0x180, away: 0x18C },
+            { name: "奇才", home: 0x198, away: 0x1A4 }
+        ];
+
+        const jerseyCharMap = {
+            'u': 117, '0': 48, '1': 49, 'h': 104, 'x': 120,
+            '2': 50, 'a': 97, '3': 51, 'c': 99, '4': 52,
+            'r': 114, '5': 53, '6': 54, '7': 55, '8': 56, '9': 57
+        };
+        const jerseyValidChars = Object.keys(jerseyCharMap).join('');
+
+        let jerseyCurrentTeamIdx = 0;
+        let jerseyIsHome = true;
+
+        function jerseyResolvePointer() {
+            if (!X || X.length === 0) return null;
+            try {
+                let base = Number(X[0].start);
+                let v1 = Number(h5gg.getValue(base + 0x23E24D0, 'I64'));
+                if (!v1) return null;
+                let v2 = Number(h5gg.getValue(v1 + 0x1B8, 'I64'));
+                if (!v2) return null;
+                let v3 = Number(h5gg.getValue(v2 + 0x0, 'I64'));
+                if (!v3) return null;
+                return v3 + 0x196;
+            } catch(e) { return null; }
+        }
+
+        function jerseyGetTargetAddr() {
+            let raw = jerseyResolvePointer();
+            if (!raw) return 0;
+            const team = jerseyTeams[jerseyCurrentTeamIdx];
+            const offset = jerseyIsHome ? team.home : team.away;
+            return raw + offset;
+        }
+
+        function jerseyWriteString() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            const str = document.getElementById('jerseyInputStr').value.trim();
+            const msgEl = document.getElementById('jerseyMsg');
+            if (!str) { msgEl.textContent = '⚠️ 请输入字符串';
+                msgEl.className = 'jersey-msg error'; return; }
+            for (let ch of str) {
+                if (!jerseyCharMap[ch]) {
+                    msgEl.textContent = '❌ 非法字符: "' + ch + '" (仅支持 ' + jerseyValidChars + ')';
+                    msgEl.className = 'jersey-msg error';
+                    return;
+                }
+            }
+            const addr = jerseyGetTargetAddr();
+            if (!addr) { msgEl.textContent = '❌ 目标地址无效';
+                msgEl.className = 'jersey-msg error'; return; }
+            let cur = addr;
+            for (let i = 0; i < str.length; i++) {
+                try { h5gg.setValue(cur, jerseyCharMap[str[i]], 'I16');
+                    cur += 2; } catch(e) {
+                    msgEl.textContent = '❌ 写入第 ' + (i+1) + ' 个字符失败';
+                    msgEl.className = 'jersey-msg error'; return; }
+            }
+            try { h5gg.setValue(cur, 0, 'I16');
+                msgEl.textContent = '✅ 字符串 "' + str + '" 写入成功';
+                msgEl.className = 'jersey-msg'; } catch(e) { msgEl.textContent = '❌ 写入结束符失败';
+                msgEl.className = 'jersey-msg error'; }
+        }
+
+        function jerseyUpdateStatus() {
+            const team = jerseyTeams[jerseyCurrentTeamIdx];
+            document.getElementById('jerseyTeamDisplay').textContent = team.name;
+            document.getElementById('jerseyModeDisplay').textContent = jerseyIsHome ? '主场' : '客场';
+        }
+
+        const diyTeams = [
+            { name: "76人", home: 0x40D, away: 0x45D },
+            { name: "黄蜂", home: 0x4AD, away: 0x4FD },
+            { name: "雄鹿", home: 0x54D, away: 0x59D },
+            { name: "公牛", home: 0x5ED, away: 0x63D },
+            { name: "骑士", home: 0x68D, away: 0x6DD },
+            { name: "凯尔特人", home: 0x72D, away: 0x77D },
+            { name: "快船", home: 0x7CD, away: 0x81D },
+            { name: "灰熊", home: 0x86D, away: 0x8BD },
+            { name: "老鹰", home: 0x90D, away: 0x95D },
+            { name: "热火", home: 0x9AD, away: 0x9FD },
+            { name: "爵士", home: 0xA4D, away: 0xA9D },
+            { name: "国王", home: 0xAED, away: 0xB3D },
+            { name: "尼克斯", home: 0xB8D, away: 0xBDD },
+            { name: "湖人", home: 0xC2D, away: 0xC7D },
+            { name: "魔术", home: 0xCCD, away: 0xD1D },
+            { name: "独行侠", home: 0xD6D, away: 0xDBD },
+            { name: "篮网", home: 0xE0D, away: 0xE5D },
+            { name: "掘金", home: 0xEAD, away: 0xEFD },
+            { name: "步行者", home: 0xF4D, away: 0xF9D },
+            { name: "鹈鹕", home: 0xFED, away: 0x103D },
+            { name: "活塞", home: 0x108D, away: 0x10DD },
+            { name: "猛龙", home: 0x112D, away: 0x117D },
+            { name: "火箭", home: 0x11CD, away: 0x121D },
+            { name: "马刺", home: 0x126D, away: 0x12BD },
+            { name: "太阳", home: 0x130D, away: 0x135D },
+            { name: "雷霆", home: 0x13AD, away: 0x13FD },
+            { name: "森林狼", home: 0x144D, away: 0x149D },
+            { name: "开拓者", home: 0x14ED, away: 0x153D },
+            { name: "勇士", home: 0x158D, away: 0x15DD },
+            { name: "奇才", home: 0x162D, away: 0x167D }
+        ];
+
+        function diyComputeAddresses() {
+            if (!X || X.length === 0) return null;
+            try {
+                let base = BigInt(X[0].start);
+                let v1 = h5gg.getValue(Number(base + BigInt(0x23E24D0)), 'I64');
+                if (!v1) return null;
+                let v2 = h5gg.getValue(Number(BigInt(v1) + BigInt(0x1B8)), 'I64');
+                if (!v2) return null;
+                let team = diyTeams[diyCurrentTeamIdx];
+                let homeOffset = BigInt(team.home);
+                let awayOffset = BigInt(team.away);
+                let raw = BigInt(v2);
+                let homeAddr = raw + homeOffset;
+                let awayAddr = raw + awayOffset;
+                return { home: homeAddr, away: awayAddr };
+            } catch(e) { return null; }
+        }
+
+        const diyColorOffsets = [
+            { label: "球衣主色R", offset: 0x1B, id: "mainR" },
+            { label: "球衣主色G", offset: 0x1C, id: "mainG" },
+            { label: "球衣主色B", offset: 0x1D, id: "mainB" },
+            { label: "护具主色R", offset: 0x1F, id: "gearMainR" },
+            { label: "护具主色G", offset: 0x20, id: "gearMainG" },
+            { label: "护具主色B", offset: 0x21, id: "gearMainB" },
+            { label: "护具副色R", offset: 0x23, id: "gearSubR" },
+            { label: "护具副色G", offset: 0x24, id: "gearSubG" },
+            { label: "护具副色B", offset: 0x25, id: "gearSubB" },
+            { label: "发带颜色R", offset: 0x27, id: "headbandR" },
+            { label: "发带颜色G", offset: 0x28, id: "headbandG" },
+            { label: "发带颜色B", offset: 0x29, id: "headbandB" },
+            { label: "Logo颜色", offset: 0x34, id: "logo" },
+            { label: "球衣副色", offset: 0x35, id: "jerseySub" },
+            { label: "球衣形式", offset: 0x36, id: "jerseyForm" },
+            { label: "边框号码", offset: 0x37, id: "borderNum" },
+            { label: "后面号码颜色", offset: 0x38, id: "numBack" },
+            { label: "前面号码颜色", offset: 0x39, id: "numFront" },
+            { label: "球鞋颜色", offset: 0x3A, id: "shoes" }
+        ];
+
+        let diyCurrentTeamIdx = 0;
+        let diyIsHome = true;
+
+        function diyGetTargetAddr() {
+            if (!X || X.length === 0) return null;
+            try {
+                let base = BigInt(X[0].start);
+                let v1 = h5gg.getValue(base + BigInt(0x23E24D0), 'I64');
+                if (!v1) return null;
+                let v2 = h5gg.getValue(BigInt(v1) + BigInt(0x1B8), 'I64');
+                if (!v2) return null;
+                let team = diyTeams[diyCurrentTeamIdx];
+                let offset = diyIsHome ? team.home : team.away;
+                return BigInt(v2) + BigInt(offset);
+            } catch(e) { return null; }
+        }
+
+        function diyReadByte(addr) {
+            try { return h5gg.getValue(Number(addr), 'I8'); } catch(e) { return null; }
+        }
+        function diyWriteByte(addr, val) {
+            try { h5gg.setValue(Number(addr), val, 'I8'); return true; } catch(e) { return false; }
+        }
+
+        function diyReadAllColors() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            const start = diyGetTargetAddr();
+            const msgEl = document.getElementById('diyMsg');
+            if (!start) { msgEl.textContent = '❌ 地址无效';
+                msgEl.className = 'jersey-msg error'; return; }
+            let count = 0;
+            diyColorOffsets.forEach(item => {
+                const addr = start + BigInt(item.offset);
+                const val = diyReadByte(addr);
+                const input = document.getElementById('diy_input_' + item.id);
+                if (input && val !== null) { input.value = val;
+                    count++; } else if (input) input.value = '';
+            });
+            msgEl.textContent = '✅ 读取完成 (' + count + '/' + diyColorOffsets.length + ')';
+            msgEl.className = 'jersey-msg';
+        }
+
+        function diyWriteAllColors() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            const start = diyGetTargetAddr();
+            const msgEl = document.getElementById('diyMsg');
+            if (!start) { msgEl.textContent = '❌ 地址无效';
+                msgEl.className = 'jersey-msg error'; return; }
+            let count = 0;
+            diyColorOffsets.forEach(item => {
+                const input = document.getElementById('diy_input_' + item.id);
+                if (!input) return;
+                const val = parseInt(input.value);
+                if (isNaN(val)) return;
+                const addr = start + BigInt(item.offset);
+                if (diyWriteByte(addr, val)) count++;
+            });
+            msgEl.textContent = '✅ 写入完成 (' + count + '/' + diyColorOffsets.length + ')';
+            msgEl.className = 'jersey-msg';
+        }
+
+        function diyRefreshAll() {
+            if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+            const start = diyGetTargetAddr();
+            const msgEl = document.getElementById('diyMsg');
+            const team = diyTeams[diyCurrentTeamIdx];
+            const modeStr = diyIsHome ? '主场' : '客场';
+            document.getElementById('diyTeamDisplay').textContent = team.name;
+            document.getElementById('diyModeDisplay').textContent = modeStr;
+            if (!start) {
+                msgEl.textContent = '❌ 地址无效，请确保游戏运行';
+                msgEl.className = 'jersey-msg error';
+                return;
+            }
+            msgEl.textContent = '✅ 已切换到 ' + team.name + ' ' + modeStr;
+            msgEl.className = 'jersey-msg';
+        }
+
+        function buildJerseyPanel() {
+            let html = '<div class="jersey-section"><h3>📝 球衣字符串修改</h3><div class="jersey-row"><select id="jerseyTeamSelect"></select><button id="jerseyHomeBtn" style="background:#90EE90;">🏠 主场</button><button id="jerseyAwayBtn">✈️ 客场</button></div><div class="jersey-status" id="jerseyStatusLine">当前: <b id="jerseyTeamDisplay">76人</b> <b id="jerseyModeDisplay">主场</b></div><div class="jersey-row"><input type="text" id="jerseyInputStr" placeholder="输入字符串，如 uh000" style="flex:1; min-width:150px;" value="111"><button id="jerseyWriteBtn">✏️ 写入</button></div><div class="jersey-hint">支持字符: u 0 1 h x 2 a 3 c 4 r 5 6 7 8 9</div><div id="jerseyMsg" class="jersey-msg">就绪</div></div><div class="jersey-divider"></div><div class="jersey-section"><h3>🎨 DIY球衣颜色</h3><div class="jersey-row"><select id="diyTeamSelect"></select><button id="diyHomeBtn" style="background:#90EE90;">🏠 主场</button><button id="diyAwayBtn">✈️ 客场</button></div><div class="jersey-status" id="diyStatusLine">当前: <b id="diyTeamDisplay">76人</b> <b id="diyModeDisplay">主场</b></div><div class="jersey-color-grid" id="diyColorGrid"></div><div class="jersey-action-group"><button id="diyReadAllBtn">📖 一键读取所有</button><button id="diyWriteAllBtn">✏️ 一键写入所有</button><button id="diySwapBtn">🔄 主客场互换</button><button id="diyEnableBtn">🔓 开启DIY</button></div><div id="diyMsg" class="jersey-msg">就绪</div></div>';
+            document.getElementById("jerseyPanel").innerHTML = html;
+
+            const jerseySelect = document.getElementById('jerseyTeamSelect');
+            jerseyTeams.forEach((t, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = t.name;
+                jerseySelect.appendChild(opt);
+            });
+            jerseySelect.value = 0;
+
+            const diySelect = document.getElementById('diyTeamSelect');
+            diyTeams.forEach((t, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = t.name;
+                diySelect.appendChild(opt);
+            });
+            diySelect.value = 0;
+
+            const colorGrid = document.getElementById('diyColorGrid');
+            diyColorOffsets.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'jersey-color-item';
+                const label = document.createElement('label');
+                label.textContent = item.label;
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = 'diy_input_' + item.id;
+                input.placeholder = '数值';
+                input.style.width = '72px';
+
+                const readBtn = document.createElement('button');
+                readBtn.textContent = '读取';
+                readBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const start = diyGetTargetAddr();
+                    const msgEl = document.getElementById('diyMsg');
+                    if (!start) { msgEl.textContent = '❌ 地址无效';
+                        msgEl.className = 'jersey-msg error'; return; }
+                    const addr = start + BigInt(item.offset);
+                    const val = diyReadByte(addr);
+                    if (val !== null) { input.value = val;
+                        msgEl.textContent = '✅ ' + item.label + ' 读取成功';
+                        msgEl.className = 'jersey-msg'; } else { msgEl.textContent = '❌ 读取失败';
+                        msgEl.className = 'jersey-msg error'; }
+                });
+
+                const writeBtn = document.createElement('button');
+                writeBtn.textContent = '写入';
+                writeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const val = parseInt(input.value);
+                    const msgEl = document.getElementById('diyMsg');
+                    if (isNaN(val)) { msgEl.textContent = '❌ 请输入有效整数';
+                        msgEl.className = 'jersey-msg error'; return; }
+                    const start = diyGetTargetAddr();
+                    if (!start) { msgEl.textContent = '❌ 地址无效';
+                        msgEl.className = 'jersey-msg error'; return; }
+                    const addr = start + BigInt(item.offset);
+                    if (diyWriteByte(addr, val)) {
+                        msgEl.textContent = '✅ ' + item.label + ' 写入成功 (' + val + ')';
+                        msgEl.className = 'jersey-msg';
+                    } else {
+                        msgEl.textContent = '❌ 写入失败';
+                        msgEl.className = 'jersey-msg error';
+                    }
+                });
+
+                div.appendChild(label);
+                div.appendChild(input);
+                div.appendChild(readBtn);
+                div.appendChild(writeBtn);
+                colorGrid.appendChild(div);
+            });
+
+            document.getElementById('jerseyTeamSelect').addEventListener('change', function() {
+                jerseyCurrentTeamIdx = parseInt(this.value);
+                jerseyUpdateStatus();
+            });
+            document.getElementById('jerseyHomeBtn').addEventListener('click', function() {
+                jerseyIsHome = true;
+                this.style.background = '#90EE90';
+                document.getElementById('jerseyAwayBtn').style.background = '';
+                jerseyUpdateStatus();
+            });
+            document.getElementById('jerseyAwayBtn').addEventListener('click', function() {
+                jerseyIsHome = false;
+                this.style.background = '#90EE90';
+                document.getElementById('jerseyHomeBtn').style.background = '';
+                jerseyUpdateStatus();
+            });
+            document.getElementById('jerseyWriteBtn').addEventListener('click', jerseyWriteString);
+            document.getElementById('jerseyInputStr').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') jerseyWriteString();
+            });
+
+            document.getElementById('diyTeamSelect').addEventListener('change', function() {
+                diyCurrentTeamIdx = parseInt(this.value);
+                diyRefreshAll();
+            });
+            document.getElementById('diyHomeBtn').addEventListener('click', function() {
+                diyIsHome = true;
+                this.style.background = '#90EE90';
+                document.getElementById('diyAwayBtn').style.background = '';
+                diyRefreshAll();
+            });
+            document.getElementById('diyAwayBtn').addEventListener('click', function() {
+                diyIsHome = false;
+                this.style.background = '#90EE90';
+                document.getElementById('diyHomeBtn').style.background = '';
+                diyRefreshAll();
+            });
+
+            document.getElementById('diyReadAllBtn').addEventListener('click', diyReadAllColors);
+            document.getElementById('diyWriteAllBtn').addEventListener('click', diyWriteAllColors);
+
+            document.getElementById('diySwapBtn').addEventListener('click', function() {
+                if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+                const addrs = diyComputeAddresses();
+                const msgEl = document.getElementById('diyMsg');
+                if (!addrs) {
+                    msgEl.textContent = '❌ 地址无效';
+                    msgEl.className = 'jersey-msg error';
+                    return;
+                }
+                const home = addrs.home;
+                const away = addrs.away;
+                const homePrev = home - 1n;
+                const awayPrev = away - 1n;
+                const valHome = diyReadByte(homePrev);
+                const valAway = diyReadByte(awayPrev);
+                if (valHome === null || valAway === null) {
+                    msgEl.textContent = '❌ 读取交换值失败';
+                    msgEl.className = 'jersey-msg error';
+                    return;
+                }
+                if (diyWriteByte(homePrev, valAway) && diyWriteByte(awayPrev, valHome)) {
+                    msgEl.textContent = '✅ 主客场已互换 (主场: ' + valAway + ', 客场: ' + valHome + ')';
+                    msgEl.className = 'jersey-msg';
+                    diyColorOffsets.forEach(item => {
+                        const inp = document.getElementById('diy_input_' + item.id);
+                        if (inp) inp.value = '';
+                    });
+                } else {
+                    msgEl.textContent = '❌ 交换写入失败';
+                    msgEl.className = 'jersey-msg error';
+                }
+            });
+
+            document.getElementById('diyEnableBtn').addEventListener('click', function() {
+                if (!X || X.length === 0) { alert("请先进入游戏"); return; }
+                const start = diyGetTargetAddr();
+                const msgEl = document.getElementById('diyMsg');
+                if (!start) { msgEl.textContent = '❌ 地址无效';
+                    msgEl.className = 'jersey-msg error'; return; }
+                if (diyWriteByte(start, 40)) {
+                    msgEl.textContent = '✅ DIY已开启';
+                    msgEl.className = 'jersey-msg';
+                    diyColorOffsets.forEach(item => {
+                        const inp = document.getElementById('diy_input_' + item.id);
+                        if (inp) inp.value = '';
+                    });
+                } else {
+                    msgEl.textContent = '❌ 开启DIY失败';
+                    msgEl.className = 'jersey-msg error';
+                }
+            });
+
+            jerseyUpdateStatus();
+            setTimeout(diyRefreshAll, 300);
+        }
+
+        // ---------- 菜单 ----------
+        const menuStructure = [
+            { name: "🔥 主要", children: [{ name: "🏀 面补", id: "c1" }, { name: "🛡️ 护具", id: "c2" }, { name: "🏟️ 街头球馆", id: "c3" }, { name: "👕 卫衣", id: "c5" }] },
+            { name: "🎮 设置", children: [{ name: "⚙️ 设置中心", id: "c9" }] },
+            { name: "💪 牛逼", children: [{ name: "🏷️ 名字", id: "c10" }, { name: "🎨 画质", id: "c11" }] },
+            { name: "⛹️ 球衣", id: "c6" },
+            { name: "🏷️ Logo", id: "c12" },
+            { name: "📖 释意", id: "c7" },
+            { name: "⚡ 无敌", id: "c8" }
+        ];
+
+        function buildDrawer() {
+            let html = '';
+            menuStructure.forEach(item => {
+                if (item.children) {
+                    html += '<div class="drawer-item" onclick="toggleSubmenuDrawer(this)">' + item.name + '<span>▼</span></div><div class="submenu-drawer" style="display:none;">';
+                    item.children.forEach(child => {
+                        html += '<div class="drawer-item" onclick="showContent(\'' + child.id + '\');closeDrawer();">' + child.name + '</div>';
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<div class="drawer-item" onclick="showContent(\'' + item.id + '\');closeDrawer();">' + item.name + '</div>';
+                }
+            });
+            document.getElementById("drawerMenuList").innerHTML = html;
+        }
+
+        window.toggleSubmenuDrawer = function(el) { let sub = el.nextElementSibling; if (sub && sub.classList.contains('submenu-drawer')) sub.style.display = sub.style.display === 'block' ? 'none' : 'block'; };
+
+        // ---------- 主初始化 ----------
+        function initMainApp() {
+            if (!requireAuth()) return;
+
+            if (!X || X.length === 0) {
+                for (let pname of PROCESS_CANDIDATES) {
+                    try {
+                        let ranges = h5gg.getRangesList(pname);
+                        if (ranges && ranges.length > 0) {
+                            X = ranges;
+                            break;
+                        }
+                    } catch(e) {}
+                }
+            }
+
+            if (!X || X.length === 0) {
+                console.warn("未找到 NBA 2K20 进程");
+            } else {
+                setupSixLocks();
+                startHack();
+            }
+
+            buildDrawer();
+            buildFacePanel();
+            buildGearPanel();
+            buildCourtPanel();
+            buildHoodiePanel();
+            buildNamePanel();
+            buildQualityPanel();
+            buildTendencyPanel();
+            buildSettingsPanel();
+            buildJerseyPanel();
+            buildLogoPanel();
+            showContent('c9');
+
+            document.getElementById('menuBtn').onclick = openDrawer;
+            document.getElementById('overlay').onclick = closeDrawer;
+            document.getElementById('closeDrawerBtn').onclick = closeDrawer;
+
+            console.log("🏀 美式释意 已启动 (安全加固版)");
+        }
+
+        // ============================================================
+        // 🚀 启动
+        // ============================================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof h5gg === 'undefined') {
+                console.warn("H5GG 未加载, 部分功能可能不可用");
+            }
+            initAuthSystem();
+        });
+
+        console.log("🔐 安全验证系统已加载");
+    </script>
+</body>
+</html>
