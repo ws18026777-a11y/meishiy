@@ -1,6 +1,0 @@
-{
-  "keys": {
-    "ABC123": { "expire": "2027-12-31", "type": "永久", "device": "DEV_BVDS7LSNXO" },
-    "DDD999": { "expire": "2027-07-30", "type": "半年", "device": "DEV_WGBOTX2LT5" }   
-  }
-}
