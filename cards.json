@@ -3,6 +3,6 @@
         "ABC123": { "expire": "2027-12-31", "type": "永久", "device": "DEV_BVDS7LSNXO" },
         "DEF456": { "expire": "2027-09-30", "type": "半年", "device": "DEV_WGBOTX2LT5" },
         "ABC888": { "expire": "2888-08-09", " type": "永久", "device": "DEV_USRHP7068E" },
-        "ABC889": { "expire": "2888-08-09", " type": "永久", "device": "" }
+        "ABC889": { "expire": "2888-08-09", " type": "永久", "device": "DEV_605T53LQQ1" }
     }
 }
