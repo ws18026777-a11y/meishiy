@@ -1,9 +1,14 @@
 {
   "keys": {
     "ABC888": {
+      "type": "æ°¸ä¹",
+      "expire": "æ°¸ä¹",
+      "device": "FP-661F0E642174E904"
+    },
+    "ABC999": {
       "type": "永久",
       "expire": "永久",
-      "device": "FP-661F0E642174E904"
+      "device": "FP-3069E317"
     }
   }
 }
