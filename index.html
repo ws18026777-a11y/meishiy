@@ -190,6 +190,27 @@ function fallbackCopy(text) {
 // GitHub API
 // ============================================================
 
+// 🔧 修复：正确解码 Base64（支持中文）
+function decodeBase64(encoded) {
+    var binary = atob(encoded);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return new TextDecoder('utf-8').decode(bytes);
+}
+
+// 🔧 修复：正确编码 Base64（支持中文）
+function encodeBase64(str) {
+    var encoder = new TextEncoder();
+    var dataBytes = encoder.encode(str);
+    var binary = '';
+    for (var i = 0; i < dataBytes.length; i++) {
+        binary += String.fromCharCode(dataBytes[i]);
+    }
+    return btoa(binary);
+}
+
 function loadFromGitHub() {
     var token = document.getElementById('tokenInput').value.trim();
     if (!token) { showToast('请先输入 GitHub Token', true); return Promise.reject('No token'); }
@@ -207,7 +228,8 @@ function loadFromGitHub() {
     })
     .then(function(data) {
         currentSha = data.sha;
-        var content = atob(data.content);
+        // ✅ 使用修复后的解码函数
+        var content = decodeBase64(data.content);
         var json = JSON.parse(content);
         currentData = json;
         return json;
@@ -218,11 +240,9 @@ function saveToGitHub(data) {
     var token = document.getElementById('tokenInput').value.trim();
     if (!token) { showToast('请先输入 GitHub Token', true); return Promise.reject('No token'); }
     
-    // 修复中文乱码：用 TextEncoder 确保 UTF-8
     var content = JSON.stringify(data, null, 2);
-    var encoder = new TextEncoder();
-    var dataBytes = encoder.encode(content);
-    var encoded = btoa(String.fromCharCode.apply(null, dataBytes));
+    // ✅ 使用修复后的编码函数
+    var encoded = encodeBase64(content);
     
     return fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + FILE_PATH, {
         method: 'PUT',
