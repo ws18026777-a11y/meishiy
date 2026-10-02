@@ -3,12 +3,12 @@
     "ABC889": {
       "type": "永久",
       "expire": "永久",
-      "device": "FP-09AFC01B76E8BB5B"
+      "device": ""
     },
     "ABC111": {
       "type": "永久",
       "expire": "永久",
-      "device": "FP-09AFC01B76E8BB5B"
+      "device": ""
     },
     "ABC123": {
       "type": "永久",
@@ -18,7 +18,7 @@
     "ABC112": {
       "type": "永久",
       "expire": "永久",
-      "device": "FP-661F0E642174E904"
+      "device": ""
     }
   }
 }
